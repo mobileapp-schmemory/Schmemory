@@ -1,4 +1,4 @@
-# Shmemory
+# Schmemory
 An app that helps people memorize speeches and scripts.<br><br>
 
 Here is a link to our Preliminary Plan<br>
