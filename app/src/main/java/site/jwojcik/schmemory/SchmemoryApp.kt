@@ -40,7 +40,6 @@ sealed class Routes {
 @Composable
 fun SchmemoryApp() {
     val navController = rememberNavController()
-
     NavHost(
         navController = navController,
         startDestination = Routes.Home

@@ -1,5 +1,7 @@
 package site.jwojcik.schmemory.ui
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -16,7 +18,11 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import site.jwojcik.schmemory.data.Line
 import site.jwojcik.schmemory.data.SceneDataSource
 
@@ -34,7 +40,7 @@ fun SceneScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = scene?.name ?: "ERROR"
+                        text = scene?.name ?: "Scene Name (err)"
                     )
                 },
                 navigationIcon = {
@@ -53,10 +59,36 @@ fun SceneScreen(
     ) { innerPadding ->
         LazyVerticalGrid(
             columns = GridCells.Fixed(1),
-            modifier = modifier.padding(innerPadding)
+            modifier = modifier
+                .padding(innerPadding)
+                .padding(32.dp)
+                .fillMaxWidth()
         ) {
-            items(scene?.lines ?: listOf(Line(text = "ERROR", characterName = "ERROR"))) { line ->
-                Text(line.text)
+            items(
+                scene?.lines ?: listOf(
+                    Line(
+                        text = "Line 1 (err)",
+                        characterName = "Character Name (err)"
+                    ), Line(text = "Line 2 (err)", characterName = "Character Name (err)")
+                )
+            ) { line ->
+                Column(
+                    modifier = modifier.padding(bottom = 24.dp)
+                ) {
+                    Text(
+                        text = line.characterName.uppercase(),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Black,
+                        textAlign = TextAlign.Center,
+                        modifier = modifier.fillMaxWidth()
+                    )
+                    Text(
+                        text = line.text,
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Left,
+                        modifier = modifier.fillMaxWidth()
+                    )
+                }
             }
         }
     }
