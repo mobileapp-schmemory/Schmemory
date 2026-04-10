@@ -1,12 +1,16 @@
 package site.jwojcik.schmemory
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
+import site.jwojcik.schmemory.ui.HomeScreen
+import site.jwojcik.schmemory.ui.ListScreen
+import site.jwojcik.schmemory.ui.SceneScreen
+import site.jwojcik.schmemory.ui.SchmemoryListType
+import site.jwojcik.schmemory.ui.SpeechScreen
 
 sealed class Routes {
     @Serializable
@@ -61,11 +65,12 @@ fun SchmemoryApp() {
             )
         }
         composable<Routes.SpeechList> {
-            SpeechListScreen(
+            ListScreen(
+                listType = SchmemoryListType.SPEECH,
                 onUpClick = {
                     navController.navigateUp()
                 },
-                onSceneClick = { speechId: Int ->
+                onItemClick = { speechId: Int ->
                     navController.navigate(
                         Routes.Scene(speechId)
                     )
@@ -84,11 +89,12 @@ fun SchmemoryApp() {
         }
 
         composable<Routes.SceneList> {
-            SceneListScreen(
+            ListScreen(
+                listType = SchmemoryListType.SCENE,
                 onUpClick = {
                     navController.navigateUp()
                 },
-                onSceneClick = { sceneId: Int ->
+                onItemClick = { sceneId: Int ->
                     navController.navigate(
                         Routes.Scene(sceneId)
                     )
@@ -106,33 +112,4 @@ fun SchmemoryApp() {
             )
         }
     }
-}
-
-@Composable
-fun SceneScreen(sceneId: Int, onUpClick: () -> Boolean) {
-    TODO("Not yet implemented")
-}
-
-@Composable
-fun SceneListScreen(onUpClick: () -> Boolean, onSceneClick: (Int) -> Unit) {
-    TODO("Not yet implemented")
-}
-
-@Composable
-fun SpeechScreen(speechId: Int, onUpClick: () -> Boolean) {
-    TODO("Not yet implemented")
-}
-
-@Composable
-fun SpeechListScreen(onUpClick: () -> Boolean, onSceneClick: (Int) -> Unit) {
-    TODO("Not yet implemented")
-}
-
-@Composable
-fun HomeScreen(
-    onScenesClick: () -> Unit,
-    onSpeechesClick: () -> Unit,
-    onSettingsClick: () -> Unit
-) {
-    Text("Home Screen")
 }
