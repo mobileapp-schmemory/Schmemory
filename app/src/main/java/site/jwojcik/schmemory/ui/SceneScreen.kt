@@ -4,7 +4,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -12,6 +16,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import site.jwojcik.schmemory.data.Line
 import site.jwojcik.schmemory.data.SceneDataSource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -22,13 +28,21 @@ fun SceneScreen(
     modifier: Modifier = Modifier,
     sceneDataSource: SceneDataSource = SceneDataSource()
 ) {
+    val scene = sceneDataSource.getScene(sceneId)
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        sceneDataSource.getScene(sceneId)?.name ?: "Error loading Scene by Id "
+                        text = scene?.name ?: "ERROR"
                     )
+                },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        onUpClick()
+                    }) {
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -41,9 +55,20 @@ fun SceneScreen(
             columns = GridCells.Fixed(1),
             modifier = modifier.padding(innerPadding)
         ) {
-            items(sceneDataSource.loadScenes()) { scene ->
-                Text(scene.name)
+            items(scene?.lines ?: listOf(Line(text = "ERROR", characterName = "ERROR"))) { line ->
+                Text(line.text)
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun ScenePreview() {
+    SceneScreen(
+        sceneId = 0,
+        onUpClick = {
+            true
+        },
+    )
 }
