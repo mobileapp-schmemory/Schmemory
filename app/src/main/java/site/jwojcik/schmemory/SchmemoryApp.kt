@@ -1,5 +1,6 @@
 package site.jwojcik.schmemory
 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -133,5 +134,5 @@ fun HomeScreen(
     onSpeechesClick: () -> Unit,
     onSettingsClick: () -> Unit
 ) {
-    TODO("Not yet implemented")
+    Text("Home Screen")
 }
