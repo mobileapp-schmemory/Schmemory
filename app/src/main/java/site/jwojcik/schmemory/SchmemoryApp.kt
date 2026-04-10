@@ -82,7 +82,39 @@ fun SchmemoryApp() {
             )
         }
 
+        composable<Routes.SceneList> {
+            SceneListScreen(
+                onUpClick = {
+                    navController.navigateUp()
+                },
+                onSceneClick = { sceneId: Int ->
+                    navController.navigate(
+                        Routes.Scene(sceneId)
+                    )
+                }
+            )
+        }
+        composable<Routes.Scene> { backstackEntry ->
+            val speech: Routes.Scene = backstackEntry.toRoute()
+
+            SceneScreen(
+                sceneId = speech.sceneId,
+                onUpClick = {
+                    navController.navigateUp()
+                }
+            )
+        }
     }
+}
+
+@Composable
+fun SceneScreen(sceneId: Int, onUpClick: () -> Boolean) {
+    TODO("Not yet implemented")
+}
+
+@Composable
+fun SceneListScreen(onUpClick: () -> Boolean, onSceneClick: (Int) -> Unit) {
+    TODO("Not yet implemented")
 }
 
 @Composable
