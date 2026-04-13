@@ -12,7 +12,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.zybooks.schmemoryhomepage.R
+import site.jwojcik.schmemory.R
 
 @Composable
 fun HomeScreen(
@@ -30,7 +29,7 @@ fun HomeScreen(
     onSpeechesClick: () -> Unit,
     onSettingsClick: () -> Unit
 ) {
-    Text("Home Screen")
+    HomePageScreen()
 }
 
 @Preview
@@ -49,7 +48,7 @@ fun HomePageScreen() {
 
     Box(
         // Box Holding All The Buttons
-        // anya is placeholder for our desired icons
+        // logo is placeholder for our desired icons
         // buttons are hard coded to positions, will need to change if we plan to animate
         // positions may be incorrect for different sized screens
         modifier = Modifier
@@ -62,13 +61,13 @@ fun HomePageScreen() {
             // Top Left Button
             SmallButton(
                 modifier = Modifier.align(Alignment.TopStart).padding(top = 230.dp, start = 22.dp),
-                iconRes = R.drawable.anya // SPEECH
+                iconRes = R.drawable.logo // SPEECH
             )
 
             // Top Right Button
             SmallButton(
                 modifier = Modifier.align(Alignment.TopEnd).padding(top = 230.dp, end = 22.dp),
-                iconRes = R.drawable.anya // SCRIPT
+                iconRes = R.drawable.logo // SCRIPT
             )
         }
 
@@ -90,7 +89,7 @@ fun HomePageScreen() {
                 )
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.anya), // LOGO
+                    painter = painterResource(id = R.drawable.logo), // LOGO
                     contentDescription = "Home Button",
                     modifier = Modifier.size(200.dp),
                     tint = Color.Unspecified
@@ -102,7 +101,7 @@ fun HomePageScreen() {
         if(showSmallButtons) {
             SmallButton(
                 modifier = Modifier.padding(top = 400.dp),
-                iconRes = R.drawable.anya // SETTINGS
+                iconRes = R.drawable.logo // SETTINGS
             )
         }
     }
