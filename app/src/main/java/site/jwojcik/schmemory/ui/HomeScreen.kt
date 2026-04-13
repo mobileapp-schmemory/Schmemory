@@ -50,7 +50,7 @@ fun HomePageScreen() {
     var showSmallButtons by remember {mutableStateOf(false)}
     Box(
         // Box Holding All The Buttons
-        // logo is placeholder for our desired icons
+        // anya is placeholder for our desired icons
         // buttons are hard coded to positions, will need to change if we plan to animate
         // positions may be incorrect for different sized screens
         modifier = Modifier
@@ -58,18 +58,18 @@ fun HomePageScreen() {
             .background(Yellow),
             contentAlignment = Alignment.Center
     ) {
-        //AnimatedVisibility(visible = showSmallButtons) to animate, breaks code though
+        // MAYBE REVISIT THIS CODE: AnimatedVisibility(visible = showSmallButtons) to animate, breaks code though
         if(showSmallButtons) {
             // Top Left Button
             SmallButton(
                 modifier = Modifier.align(Alignment.TopStart).padding(top = 230.dp, start = 22.dp),
-                iconRes = R.drawable.logo // SPEECH
+                iconRes = R.drawable.anya // SPEECH
             )
 
             // Top Right Button
             SmallButton(
                 modifier = Modifier.align(Alignment.TopEnd).padding(top = 230.dp, end = 22.dp),
-                iconRes = R.drawable.logo // SCRIPT
+                iconRes = R.drawable.anya // SCRIPT
             )
         }
 
@@ -103,7 +103,7 @@ fun HomePageScreen() {
         if(showSmallButtons) {
             SmallButton(
                 modifier = Modifier.padding(top = 400.dp),
-                iconRes = R.drawable.logo // SETTINGS
+                iconRes = R.drawable.anya // SETTINGS
             )
         }
     }
