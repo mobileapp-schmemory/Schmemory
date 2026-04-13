@@ -1,6 +1,6 @@
 package site.jwojcik.schmemory.ui
 
-import androidx.compose.material3.Text
+import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Box
@@ -22,6 +22,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import site.jwojcik.schmemory.R
+import site.jwojcik.schmemory.ui.theme.Blue
+import site.jwojcik.schmemory.ui.theme.Green
+import site.jwojcik.schmemory.ui.theme.Yellow
 
 @Composable
 fun HomeScreen(
@@ -45,7 +48,6 @@ fun HomePreview() {
 @Composable
 fun HomePageScreen() {
     var showSmallButtons by remember {mutableStateOf(false)}
-
     Box(
         // Box Holding All The Buttons
         // logo is placeholder for our desired icons
@@ -53,7 +55,7 @@ fun HomePageScreen() {
         // positions may be incorrect for different sized screens
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .background(Yellow),
             contentAlignment = Alignment.Center
     ) {
         //AnimatedVisibility(visible = showSmallButtons) to animate, breaks code though
@@ -85,7 +87,7 @@ fun HomePageScreen() {
                 shape = CircleShape,
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF659157)
+                    containerColor = Blue
                 )
             ) {
                 Icon(
@@ -118,13 +120,13 @@ fun SmallButton(
         shape = CircleShape,
         contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFFF0C987)
+            containerColor = Green
         )
     ) {
         Icon(
             painter = painterResource(id = iconRes),
             contentDescription = null,
-            modifier = Modifier.size(40.dp),
+            modifier = Modifier.size(60.dp),
             tint = Color.Unspecified
         )
     }
