@@ -9,3 +9,12 @@ val Pink80 = Color(0xFFEFB8C8)
 val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
+
+//THESE ARE OUR ACTUAL SCHMEMORY COLOR SCHEME COLORS!!
+//These colors were generated using the coolers website
+//You can find it at this link: https://coolors.co/f79256-fbd1a2-7dcfb6-00b2ca-1d4e89
+val Gray = Color(0xFF483C46)
+val Green = Color(0xFF659157)
+val Blue = Color(0xFF7CAFC4)
+val Yellow = Color(0xFFF0C987)
+val Purple = Color(0xFFB796AC)
