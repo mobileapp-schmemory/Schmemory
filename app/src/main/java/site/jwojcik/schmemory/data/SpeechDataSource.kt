@@ -1,14 +1,13 @@
 package site.jwojcik.schmemory.data
 
-class SceneDataSource {
-    private var sceneList = listOf<Scene>(
-        Scene(
+class SpeechDataSource {
+    private var speechList = listOf<Speech>(
+        Speech(
             id = 0,
-            name = "Window Scene (Excerpt)",
-            readingFor = "Juliet",
+            name = "Window Scene (Excerpt, as speech)",
             lines = listOf(
-                SceneLine("Juliet","Ay, me!"),
-                SceneLine("Romeo","She speaks. " +
+                SpeechLine("Ay, me!"),
+                SpeechLine("She speaks. " +
                         "O, speak again, bright angel, for thou art " +
                         "As glorious to this night, being o'er my head, " +
                         "As is a wingèd messenger of heaven " +
@@ -16,12 +15,12 @@ class SceneDataSource {
                         "Of mortals that fall back to gaze on him " +
                         "When he bestrides the lazy puffing clouds " +
                         "And sails upon the bosom of the air."),
-                SceneLine("Juliet","O Romeo, Romeo! Wherefore art thou Romeo? " +
+                SpeechLine("O Romeo, Romeo! Wherefore art thou Romeo? " +
                         "Deny thy father and refuse thy name; " +
                         "Or, if thou wilt not, be but sworn my love, " +
                         "And I'll no longer be a Capulet."),
-                SceneLine("Romeo","Shall I hear more, or shall I speak at this?"),
-                SceneLine("Juliet","'Tis but thy name that is my enemy; " +
+                SpeechLine("Shall I hear more, or shall I speak at this?"),
+                SpeechLine("'Tis but thy name that is my enemy; " +
                         "Thou art thyself, though not a Montague. " +
                         "What's Montague? It is nor hand, nor foot, " +
                         "Nor arm, nor face, nor any other part " +
@@ -33,44 +32,44 @@ class SceneDataSource {
                         "Without that title. Romeo, doff thy name, " +
                         "And for that name, which is no part of thee, " +
                         "Take all myself."),
-                SceneLine("Romeo", "I take thee at thy word. " +
+                SpeechLine( "I take thee at thy word. " +
                         "Call me but love, and I'll be new baptized; " +
                         "Henceforth I never will be Romeo."),
-                SceneLine("Juliet", "What man art thou that, thus bescreened in night, " +
+                SpeechLine( "What man art thou that, thus bescreened in night, " +
                         "So stumblest on my counsel?"),
-                SceneLine("Romeo", "By a name " +
+                SpeechLine( "By a name " +
                         "I know not how to tell thee who I am. " +
                         "My name, dear saint, is hateful to myself, " +
                         "Because it is an enemy to thee. " +
                         "Had I it written, I would tear the word."),
-                SceneLine("Juliet", "My ears have not yet drunk a hundred words " +
+                SpeechLine( "My ears have not yet drunk a hundred words " +
                         "Of that tongue's uttering, yet I know the sound. " +
                         "Art thou not Romeo and a Montague?"),
-                SceneLine("Romeo", "Neither, fair maid, if either thee dislike."),
-                SceneLine("Juliet", "How camest thou hither, tell me, and wherefore? " +
+                SpeechLine( "Neither, fair maid, if either thee dislike."),
+                SpeechLine( "How camest thou hither, tell me, and wherefore? " +
                         "The orchard walls are high and hard to climb, " +
                         "And the place death, considering who thou art, " +
                         "If any of my kinsmen find thee here."),
-                SceneLine("Romeo", "With love's light wings did I o'erperch these walls, " +
+                SpeechLine( "With love's light wings did I o'erperch these walls, " +
                         "For stony limits cannot hold love out; " +
                         "And what love can do, that dares love attempt. " +
                         "Therefore thy kinsmen are no stop to me."),
-                SceneLine("Juliet", "If they do see thee, they will murder thee."),
-                SceneLine("Romeo", "Alack, there lies more peril in thine eye " +
+                SpeechLine( "If they do see thee, they will murder thee."),
+                SpeechLine( "Alack, there lies more peril in thine eye " +
                         "Than twenty of their swords. Look thou but sweet, " +
                         "And I am proof against their enmity."),
-                SceneLine("Juliet", "I would not for the world they saw thee here."),
-                SceneLine("Romeo", "I have night's cloak to hide me from their eyes, " +
+                SpeechLine( "I would not for the world they saw thee here."),
+                SpeechLine( "I have night's cloak to hide me from their eyes, " +
                         "And but thou love me, let them find me here. " +
                         "My life were better ended by their hate, " +
                         "Than death proroguèd, wanting of thy love."),
-                SceneLine("Juliet", "By whose direction found'st thou out this place?"),
-                SceneLine("Romeo", "By love, that first did prompt me to inquire. " +
+                SpeechLine( "By whose direction found'st thou out this place?"),
+                SpeechLine( "By love, that first did prompt me to inquire. " +
                         "He lent me counsel, and I lent him eyes. " +
                         "I am no pilot, yet wert thou as far " +
                         "As that vast shore washed with the farthest sea, " +
                         "I would adventure for such merchandise."),
-                SceneLine("Juliet", "Thou knowest the mask of night is on my face, " +
+                SpeechLine( "Thou knowest the mask of night is on my face, " +
                         "Else would a maiden blush bepaint my cheek " +
                         "For that which thou hast heard me speak tonight. " +
                         "Fain would I dwell on form; fain, fain deny " +
@@ -96,9 +95,9 @@ class SceneDataSource {
         )
     );
 
-    fun getScene(id: Int): Scene? {
-        return sceneList.find { it.id == id }
+    fun getSpeech(id: Int): Speech? {
+        return speechList.find { it.id == id }
     }
 
-    fun loadScenes() = sceneList
+    fun loadSpeeches() = speechList
 }

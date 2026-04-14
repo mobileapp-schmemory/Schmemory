@@ -6,20 +6,28 @@ interface Script {
     val lines: List<Line>
 }
 
-data class Line (
-    val characterName: String,
+interface Line {
     val text: String
-)
+}
+
+data class SpeechLine (
+    override val text: String
+) : Line;
+
+data class SceneLine (
+    val characterName: String,
+    override val text: String
+) : Line;
 
 data class Scene (
     override val id: Int = 0,
     override val name: String,
     val readingFor: String,
-    override val lines: List<Line>
+    override val lines: List<SceneLine>
 ) : Script;
 
 data class Speech (
     override val id: Int = 0,
     override val name: String,
-    override val lines: List<Line>
+    override val lines: List<SpeechLine>
 ) : Script;

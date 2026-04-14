@@ -39,6 +39,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import site.jwojcik.schmemory.R
 import site.jwojcik.schmemory.data.SceneDataSource
+import site.jwojcik.schmemory.data.Script
+import site.jwojcik.schmemory.data.SpeechDataSource
 
 enum class SchmemoryListType { SCENE, SPEECH }
 
@@ -49,13 +51,9 @@ fun ListScreen(
     onUpClick: () -> Boolean,
     onItemClick: (Int) -> Unit
 ) {
-
-    var scriptList: List<Any>
-
-    if (listType == SchmemoryListType.SCENE) {
-        scriptList = SceneDataSource().loadScenes()
-    } else {
-        //scriptList = SpeechDataSource().loadScenes()
+    val scriptList = when (listType) {
+        SchmemoryListType.SCENE -> SceneDataSource().loadScenes()
+        else -> SpeechDataSource().loadSpeeches()
     }
 
 
@@ -65,16 +63,14 @@ fun ListScreen(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            ItemList(
-                itemList = scriptList
-            )
+            ItemList(itemList = scriptList)
         }
     }
 }
 
 @Composable
 fun ItemList(
-    itemList: List<Any>
+    itemList: List<Script>
 ) {
     LazyColumn {
         items(
@@ -92,7 +88,7 @@ fun ItemList(
 
 @Composable
 fun ScriptCard(
-    script: Any,
+    script: Script,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -109,7 +105,7 @@ fun ScriptCard(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = script.title,
+                text = script.name,
                 modifier = modifier.padding(start = 12.dp),
                 color = Color.Black
             )
