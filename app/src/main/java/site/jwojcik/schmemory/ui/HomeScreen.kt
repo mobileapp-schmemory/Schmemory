@@ -62,14 +62,14 @@ fun HomePageScreen(
             // Top Left Button
             SmallButton(
                 modifier = Modifier.align(Alignment.TopStart).padding(top = 230.dp, start = 22.dp),
-                iconRes = R.drawable.anya, // SPEECH
+                iconRes = R.drawable.masks, // SPEECH
                 onClick = onSpeechesClick
             )
 
             // Top Right Button
             SmallButton(
                 modifier = Modifier.align(Alignment.TopEnd).padding(top = 230.dp, end = 22.dp),
-                iconRes = R.drawable.anya, // SCRIPT
+                iconRes = R.drawable.podium, // SCRIPT
                 onClick = onScenesClick
             )
         }
@@ -104,7 +104,7 @@ fun HomePageScreen(
         if(showSmallButtons) {
             SmallButton(
                 modifier = Modifier.padding(top = 400.dp),
-                iconRes = R.drawable.anya, // SETTINGS
+                iconRes = R.drawable.gear_placeholder, // SETTINGS
                 onClick = onSettingsClick
             )
         }
