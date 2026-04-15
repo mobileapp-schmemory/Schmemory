@@ -11,4 +11,6 @@ Here is a link to secondary icon designs by Sarah Todd<br>
 Podium:<br>
 https://docs.google.com/drawings/d/1R0qNiTGEghpPrw1CekOTFmzXwNs1IaVquf9ig_OKkzs/edit<br>
 Masks:<br>
-https://docs.google.com/drawings/d/17IaiTs45wIQpZlKRT8BrYhzwYrMlUvo5FUYdnpxSygk/edit
+https://docs.google.com/drawings/d/17IaiTs45wIQpZlKRT8BrYhzwYrMlUvo5FUYdnpxSygk/edit<br>
+Gear:<br>
+https://docs.google.com/drawings/d/10qa2f4WJoJq-Ds5SI5zJGN-_xvfXS8ze-lU2Eto44v8/edit?usp=sharing
