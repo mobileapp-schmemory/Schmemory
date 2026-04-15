@@ -66,10 +66,10 @@ fun SceneScreen(
         ) {
             items(
                 scene?.lines ?: listOf(
-                    Line(
-                        text = "Line 1 (err)",
-                        characterName = "Character Name (err)"
-                    ), Line(text = "Line 2 (err)", characterName = "Character Name (err)")
+                    //Line(
+                      //  text = "Line 1 (err)",
+                       // characterName = "Character Name (err)"
+                    //), Line(text = "Line 2 (err)", characterName = "Character Name (err)")
                 )
             ) { line ->
                 Column(

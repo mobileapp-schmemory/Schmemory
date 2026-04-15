@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -32,21 +33,19 @@ fun HomeScreen(
     onSpeechesClick: () -> Unit,
     onSettingsClick: () -> Unit
 ) {
-    HomePageScreen()
-}
-
-@Preview
-@Composable
-fun HomePreview() {
-    HomeScreen(
-        onScenesClick = {},
-        onSpeechesClick = {},
-        onSettingsClick = {}
+    HomePageScreen(
+        onScenesClick = onScenesClick,
+        onSpeechesClick = onSpeechesClick,
+        onSettingsClick = onSettingsClick
     )
 }
 
 @Composable
-fun HomePageScreen() {
+fun HomePageScreen(
+    onScenesClick: () -> Unit,
+    onSpeechesClick: () -> Unit,
+    onSettingsClick: () -> Unit
+) {
     var showSmallButtons by remember {mutableStateOf(false)}
     Box(
         // Box Holding All The Buttons
@@ -63,13 +62,15 @@ fun HomePageScreen() {
             // Top Left Button
             SmallButton(
                 modifier = Modifier.align(Alignment.TopStart).padding(top = 230.dp, start = 22.dp),
-                iconRes = R.drawable.anya // SPEECH
+                iconRes = R.drawable.anya, // SPEECH
+                onClick = onSpeechesClick
             )
 
             // Top Right Button
             SmallButton(
                 modifier = Modifier.align(Alignment.TopEnd).padding(top = 230.dp, end = 22.dp),
-                iconRes = R.drawable.anya // SCRIPT
+                iconRes = R.drawable.anya, // SCRIPT
+                onClick = onScenesClick
             )
         }
 
@@ -85,7 +86,7 @@ fun HomePageScreen() {
                 },
                 modifier = Modifier.size(240.dp),
                 shape = CircleShape,
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
+                contentPadding = PaddingValues(0.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Blue
                 )
@@ -103,7 +104,8 @@ fun HomePageScreen() {
         if(showSmallButtons) {
             SmallButton(
                 modifier = Modifier.padding(top = 400.dp),
-                iconRes = R.drawable.anya // SETTINGS
+                iconRes = R.drawable.anya, // SETTINGS
+                onClick = onSettingsClick
             )
         }
     }
@@ -112,13 +114,14 @@ fun HomePageScreen() {
 @Composable
 fun SmallButton(
     modifier: Modifier = Modifier,
-    iconRes: Int
+    iconRes: Int,
+    onClick: () -> Unit
 ) {
     Button(
-        onClick = { },
+        onClick = onClick,
         modifier = modifier.size(80.dp),
         shape = CircleShape,
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
+        contentPadding = PaddingValues(0.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Green
         )
