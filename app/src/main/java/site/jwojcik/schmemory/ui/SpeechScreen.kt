@@ -5,7 +5,7 @@ import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun SpeechScreen(speechId: Int, onUpClick: () -> Boolean) {
-    TODO("Not yet implemented")
+    //TODO("Not yet implemented")
 }
 
 @Preview

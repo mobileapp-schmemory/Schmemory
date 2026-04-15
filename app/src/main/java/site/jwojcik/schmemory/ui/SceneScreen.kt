@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import site.jwojcik.schmemory.data.Line
 import site.jwojcik.schmemory.data.SceneDataSource
+import site.jwojcik.schmemory.data.SceneLine
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,10 +67,10 @@ fun SceneScreen(
         ) {
             items(
                 scene?.lines ?: listOf(
-                    //Line(
-                      //  text = "Line 1 (err)",
-                       // characterName = "Character Name (err)"
-                    //), Line(text = "Line 2 (err)", characterName = "Character Name (err)")
+                    SceneLine(
+                        text = "Line 1 (err)",
+                        characterName = "Character Name (err)"
+                    ), SceneLine(text = "Line 2 (err)", characterName = "Character Name (err)")
                 )
             ) { line ->
                 Column(
