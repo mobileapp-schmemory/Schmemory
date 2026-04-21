@@ -39,7 +39,6 @@ fun ListScreen(
         else -> SpeechDataSource().loadSpeeches()
     }
 
-
     Scaffold { innerPadding ->
         Column(
             modifier = modifier
