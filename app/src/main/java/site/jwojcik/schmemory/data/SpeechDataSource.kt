@@ -106,6 +106,13 @@ class SpeechDataSource {
                     "I am super evil MWAHAHAHA"
                 )
             )
+        ),
+        Speech(
+            id = 2,
+            name = "Fart",
+            lines = listOf(
+                SpeechLine("I farted guys.")
+            )
         )
     );
 

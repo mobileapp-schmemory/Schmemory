@@ -62,14 +62,14 @@ fun HomePageScreen(
             // Top Left Button
             SmallButton(
                 modifier = Modifier.align(Alignment.TopStart).padding(top = 230.dp, start = 22.dp),
-                iconRes = R.drawable.masks, // SPEECH
+                iconRes = R.drawable.podium, // SPEECH
                 onClick = onSpeechesClick
             )
 
             // Top Right Button
             SmallButton(
                 modifier = Modifier.align(Alignment.TopEnd).padding(top = 230.dp, end = 22.dp),
-                iconRes = R.drawable.podium, // SCRIPT
+                iconRes = R.drawable.masks, // SCENE
                 onClick = onScenesClick
             )
         }

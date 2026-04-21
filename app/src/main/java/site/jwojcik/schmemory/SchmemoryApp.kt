@@ -10,6 +10,7 @@ import site.jwojcik.schmemory.ui.HomeScreen
 import site.jwojcik.schmemory.ui.ListScreen
 import site.jwojcik.schmemory.ui.SceneScreen
 import site.jwojcik.schmemory.ui.SchmemoryListType
+import site.jwojcik.schmemory.ui.SettingsScreen
 import site.jwojcik.schmemory.ui.SpeechScreen
 
 sealed class Routes {
@@ -63,6 +64,13 @@ fun SchmemoryApp() {
                 }
             )
         }
+        composable<Routes.SettingsList> {
+            SettingsScreen(
+                onUpClick = {
+                    navController.navigateUp()
+                }
+            )
+        }
         composable<Routes.SpeechList> {
             ListScreen(
                 listType = SchmemoryListType.SPEECH,
@@ -71,7 +79,7 @@ fun SchmemoryApp() {
                 },
                 onItemClick = { speechId: Int ->
                     navController.navigate(
-                        Routes.Scene(speechId)
+                        Routes.Speech(speechId)
                     )
                 }
             )
