@@ -1,11 +1,11 @@
-#Wed Apr 15 14:07:14 EDT 2026
-base.0=/Users/jm12wojc/AndroidStudioProjects/Schmemory4/app/build/intermediates/dex/debug/mergeExtDexDebug/classes.dex
-base.1=/Users/jm12wojc/AndroidStudioProjects/Schmemory4/app/build/intermediates/dex/debug/mergeProjectDexDebug/0/classes.dex
-base.2=/Users/jm12wojc/AndroidStudioProjects/Schmemory4/app/build/intermediates/dex/debug/mergeProjectDexDebug/1/classes.dex
-base.3=/Users/jm12wojc/AndroidStudioProjects/Schmemory4/app/build/intermediates/dex/debug/mergeProjectDexDebug/12/classes.dex
-base.4=/Users/jm12wojc/AndroidStudioProjects/Schmemory4/app/build/intermediates/dex/debug/mergeProjectDexDebug/14/classes.dex
-base.5=/Users/jm12wojc/AndroidStudioProjects/Schmemory4/app/build/intermediates/dex/debug/mergeProjectDexDebug/2/classes.dex
-base.6=/Users/jm12wojc/AndroidStudioProjects/Schmemory4/app/build/intermediates/dex/debug/mergeExtDexDebug/classes2.dex
+#Tue Apr 21 12:09:36 EDT 2026
+base.0=/Users/sarahtodd/AndroidStudioProjects/Schmemory/app/build/intermediates/dex/debug/mergeExtDexDebug/classes.dex
+base.1=/Users/sarahtodd/AndroidStudioProjects/Schmemory/app/build/intermediates/dex/debug/mergeProjectDexDebug/0/classes.dex
+base.2=/Users/sarahtodd/AndroidStudioProjects/Schmemory/app/build/intermediates/dex/debug/mergeProjectDexDebug/1/classes.dex
+base.3=/Users/sarahtodd/AndroidStudioProjects/Schmemory/app/build/intermediates/dex/debug/mergeProjectDexDebug/12/classes.dex
+base.4=/Users/sarahtodd/AndroidStudioProjects/Schmemory/app/build/intermediates/dex/debug/mergeProjectDexDebug/14/classes.dex
+base.5=/Users/sarahtodd/AndroidStudioProjects/Schmemory/app/build/intermediates/dex/debug/mergeProjectDexDebug/2/classes.dex
+base.6=/Users/sarahtodd/AndroidStudioProjects/Schmemory/app/build/intermediates/dex/debug/mergeExtDexDebug/classes2.dex
 path.0=classes.dex
 path.1=0/classes.dex
 path.2=1/classes.dex

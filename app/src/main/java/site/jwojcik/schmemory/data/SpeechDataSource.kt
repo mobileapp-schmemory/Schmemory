@@ -92,6 +92,20 @@ class SpeechDataSource {
                         "And not impute this yielding to light love, " +
                         "Which the dark night hath so discoverèd.")
             )
+        ),
+        Speech(
+            id = 1,
+            name = "Sarah",
+            lines = listOf(
+                SpeechLine(
+                    "Hello, my name is Sarah Todd. " +
+                    "I like the color blue, and I like elephants."
+                ),
+                SpeechLine(
+                    "My name is David and I am Sarah's twin. " +
+                    "I am super evil MWAHAHAHA"
+                )
+            )
         )
     );
 
