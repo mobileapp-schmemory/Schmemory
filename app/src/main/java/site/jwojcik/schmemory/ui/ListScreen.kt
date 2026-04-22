@@ -1,18 +1,27 @@
 package site.jwojcik.schmemory.ui
 
+import android.R.attr.tint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -35,13 +44,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lint.kotlin.metadata.Visibility
 import site.jwojcik.schmemory.data.SceneDataSource
 import site.jwojcik.schmemory.data.Script
 import site.jwojcik.schmemory.data.SpeechDataSource
 import site.jwojcik.schmemory.ui.theme.Blue
 import site.jwojcik.schmemory.ui.theme.Yellow
 import site.jwojcik.schmemory.R
+import site.jwojcik.schmemory.data.Speech
+import site.jwojcik.schmemory.data.SpeechLine
+import site.jwojcik.schmemory.ui.theme.Gray
+import site.jwojcik.schmemory.ui.theme.Green
+import site.jwojcik.schmemory.ui.theme.Purple
 
 enum class SchmemoryListType { SCENE, SPEECH }
 
@@ -58,33 +75,45 @@ fun ListScreen(
         else -> SpeechDataSource().loadSpeeches()
     }
 
-    Scaffold(containerColor = Yellow,
+    Scaffold(
+        containerColor = Yellow,
         modifier = modifier,
-        topBar = { TopAppBar(
-            title = { if("${listType.name}".equals("SPEECH")) {
-                Text(text = "Speeches")
-            } else {
-                Text(text = "Scenes")
-            }
-                    },
-            navigationIcon = {
-                IconButton(onClick = { onUpClick() }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.Unspecified)
-                }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Blue
-            ),
-            actions = {
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(Icons.Filled.Settings, contentDescription = "Settings")
-                }
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(Icons.Filled.Edit, contentDescription = "Add")
-                }
-            },
-            modifier = modifier
-        )
+        topBar = {
+            TopAppBar(
+                title = {
+                    if ("${listType.name}".equals("SPEECH")) {
+                        Text(text = "Speeches")
+                    } else {
+                        Text(text = "Scenes")
+                    }
+                },
+                navigationIcon = {
+                    IconButton(onClick = { onUpClick() }) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.Unspecified
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Blue
+                ),
+                actions = {
+                    IconButton(onClick = { /*TODO*/ }) {
+                        Icon(Icons.Filled.Search, contentDescription = "Search")
+                    }
+                    IconButton(onClick = { /*TODO*/ }) {
+                        // Make this more obviously add button
+                        Icon(Icons.Filled.AddCircle, contentDescription = "Add")
+                    }
+                    IconButton(onClick = { /*TODO*/ }) {
+                        // select multiple for deletion
+                        Icon(Icons.Filled.CheckCircle, contentDescription = "Select")
+                    }
+                },
+                modifier = modifier
+            )
         }
     ) { innerPadding ->
         Column(
@@ -92,6 +121,7 @@ fun ListScreen(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
+            // Make items span entire width of screen, left side have "play" button. all the way to the right an edit button and a view button
             ItemList(itemList = scriptList, onItemClick)
         }
     }
@@ -116,6 +146,7 @@ fun ItemList(
     }
 }
 
+
 @Composable
 fun ScriptCard(
     script: Script,
@@ -125,27 +156,52 @@ fun ScriptCard(
     Card(
         modifier = modifier
             .padding(8.dp)
-            .fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = Yellow
-        )
+            .fillMaxWidth()
+            .border(width = 3.dp, color = Purple),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Row(
-            modifier = modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(
-                colors = ButtonDefaults.buttonColors(Blue),
-                onClick = {
-                onItemClick(script.id)
-            }) {
-                Text(
-                    text = script.name,
-                    modifier = modifier.padding(start = 12.dp, end = 12.dp),
-                    color = Color.Black
-                )
+            // Play Button (Left-most)
+            IconButton(
+                onClick = { /* TODO */ }
+            ) {
+                Icon(Icons.Filled.PlayArrow, contentDescription = "Play")
+            }
+
+            // Text immediately after the button)
+            Text(
+                text = if (script.name.length > 24) "${script.name.take(24)}..." else script.name,
+                color = Color.Black,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier
+                    .weight(1f) // This "pushes" the remaining icons to the far right
+                    .padding(start = 4.dp) // Add a tiny bit of space from the play button
+            )
+
+            // Edit and Info Buttons (Right-most)
+            IconButton(onClick = { /* TODO */ }) {
+                Icon(Icons.Filled.Edit, contentDescription = "Edit")
+            }
+            IconButton(onClick = { /* TODO */ }) {
+                //Make a little eyeball icon
+                //Icon(Icons.Filled.Info, contentDescription = "View")
+                Icon(painter = painterResource(id = R.drawable.anya), contentDescription = "View Placeholder", tint = Color.Unspecified)
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun ListPreview() {
+    ListScreen(
+        listType = SchmemoryListType.SPEECH,
+        onUpClick = { true },
+        onItemClick = { }
+    )
 }
