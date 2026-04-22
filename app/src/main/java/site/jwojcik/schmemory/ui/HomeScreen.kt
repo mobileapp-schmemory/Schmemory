@@ -104,7 +104,7 @@ fun HomePageScreen(
         if(showSmallButtons) {
             SmallButton(
                 modifier = Modifier.padding(top = 400.dp),
-                iconRes = R.drawable.gear_placeholder, // SETTINGS
+                iconRes = R.drawable.gear, // SETTINGS
                 onClick = onSettingsClick
             )
         }
