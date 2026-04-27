@@ -1,16 +1,16 @@
-#Wed Apr 22 15:45:42 EDT 2026
-base.0=C\:\\Users\\blizz\\AndroidStudioProjects\\Schmemory\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
-base.1=C\:\\Users\\blizz\\AndroidStudioProjects\\Schmemory\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
-base.2=C\:\\Users\\blizz\\AndroidStudioProjects\\Schmemory\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\12\\classes.dex
-base.3=C\:\\Users\\blizz\\AndroidStudioProjects\\Schmemory\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\14\\classes.dex
-base.4=C\:\\Users\\blizz\\AndroidStudioProjects\\Schmemory\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\1\\classes.dex
-base.5=C\:\\Users\\blizz\\AndroidStudioProjects\\Schmemory\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\2\\classes.dex
-base.6=C\:\\Users\\blizz\\AndroidStudioProjects\\Schmemory\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes2.dex
+#Wed Apr 22 15:58:15 EDT 2026
+base.0=/Users/sarahtodd/AndroidStudioProjects/Schmemory/app/build/intermediates/dex/debug/mergeExtDexDebug/classes.dex
+base.1=/Users/sarahtodd/AndroidStudioProjects/Schmemory/app/build/intermediates/dex/debug/mergeProjectDexDebug/0/classes.dex
+base.2=/Users/sarahtodd/AndroidStudioProjects/Schmemory/app/build/intermediates/dex/debug/mergeProjectDexDebug/1/classes.dex
+base.3=/Users/sarahtodd/AndroidStudioProjects/Schmemory/app/build/intermediates/dex/debug/mergeProjectDexDebug/12/classes.dex
+base.4=/Users/sarahtodd/AndroidStudioProjects/Schmemory/app/build/intermediates/dex/debug/mergeProjectDexDebug/14/classes.dex
+base.5=/Users/sarahtodd/AndroidStudioProjects/Schmemory/app/build/intermediates/dex/debug/mergeProjectDexDebug/2/classes.dex
+base.6=/Users/sarahtodd/AndroidStudioProjects/Schmemory/app/build/intermediates/dex/debug/mergeExtDexDebug/classes2.dex
 path.0=classes.dex
 path.1=0/classes.dex
-path.2=12/classes.dex
-path.3=14/classes.dex
-path.4=1/classes.dex
+path.2=1/classes.dex
+path.3=12/classes.dex
+path.4=14/classes.dex
 path.5=2/classes.dex
 path.6=classes2.dex
 renamed.0=classes.dex

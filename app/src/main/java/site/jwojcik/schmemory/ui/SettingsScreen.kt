@@ -1,8 +1,10 @@
 package site.jwojcik.schmemory.ui
 
 import android.content.Context
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -41,7 +43,7 @@ import kotlinx.serialization.json.Json
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.background(Yellow).fillMaxSize(),
     onUpClick: () -> Unit = {}
 ) {
     val store = PreferenceStorage(LocalContext.current)
