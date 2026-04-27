@@ -4,6 +4,7 @@ ADDED from /Users/sarahtodd/AndroidStudioProjects/Schmemory/app/src/main/Android
 INJECTED from /Users/sarahtodd/AndroidStudioProjects/Schmemory/app/src/main/AndroidManifest.xml:2:1-27:12
 INJECTED from /Users/sarahtodd/AndroidStudioProjects/Schmemory/app/src/main/AndroidManifest.xml:2:1-27:12
 INJECTED from /Users/sarahtodd/AndroidStudioProjects/Schmemory/app/src/main/AndroidManifest.xml:2:1-27:12
+MERGED from [androidx.datastore:datastore-preferences:1.0.0] /Users/sarahtodd/.gradle/caches/9.1.0/transforms/c56dbce3bc59dd1e094fe68a42d61d3e/transformed/datastore-preferences-1.0.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.navigation:navigation-runtime-android:2.9.7] /Users/sarahtodd/.gradle/caches/9.1.0/transforms/423aead62e53daaeb5ba9f009e7f65d8/transformed/navigation-runtime-release/AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.navigation:navigation-common-android:2.9.7] /Users/sarahtodd/.gradle/caches/9.1.0/transforms/7753cac9c0204514a9272231ed43575c/transformed/navigation-common-release/AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.navigation:navigation-compose-android:2.9.7] /Users/sarahtodd/.gradle/caches/9.1.0/transforms/25725adf99f6fd4e4f36680d491b3ad0/transformed/navigation-compose-release/AndroidManifest.xml:2:1-7:12
@@ -61,6 +62,7 @@ MERGED from [androidx.activity:activity:1.13.0] /Users/sarahtodd/.gradle/caches/
 MERGED from [androidx.activity:activity-compose:1.13.0] /Users/sarahtodd/.gradle/caches/9.1.0/transforms/e7c8f7346b06da3db3c9662b7fd0a6cb/transformed/activity-compose-1.13.0/AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.customview:customview-poolingcontainer:1.0.0] /Users/sarahtodd/.gradle/caches/9.1.0/transforms/d82b6b492400cd83f958999d895948ad/transformed/customview-poolingcontainer-1.0.0/AndroidManifest.xml:17:1-23:12
 MERGED from [androidx.core:core-ktx:1.18.0] /Users/sarahtodd/.gradle/caches/9.1.0/transforms/90b32d50f85ac3422c2877bb5879e30d/transformed/core-ktx-1.18.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.datastore:datastore:1.0.0] /Users/sarahtodd/.gradle/caches/9.1.0/transforms/8fc887b51fd2bbbc9c6e6e406ceaf44b/transformed/datastore-1.0.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.annotation:annotation-experimental:1.4.1] /Users/sarahtodd/.gradle/caches/9.1.0/transforms/103519ff25f078946e745c4dac3712e4/transformed/annotation-experimental-1.4.1/AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.core:core-viewtree:1.0.0] /Users/sarahtodd/.gradle/caches/9.1.0/transforms/01a66aa0dad1716b760c65f6dab95a9e/transformed/core-viewtree-1.0.0/AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/sarahtodd/.gradle/caches/9.1.0/transforms/eed635979522dc4bea52fa28274866de/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:17:1-27:12
@@ -147,6 +149,8 @@ uses-sdk
 INJECTED from /Users/sarahtodd/AndroidStudioProjects/Schmemory/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from /Users/sarahtodd/AndroidStudioProjects/Schmemory/app/src/main/AndroidManifest.xml
 INJECTED from /Users/sarahtodd/AndroidStudioProjects/Schmemory/app/src/main/AndroidManifest.xml
+MERGED from [androidx.datastore:datastore-preferences:1.0.0] /Users/sarahtodd/.gradle/caches/9.1.0/transforms/c56dbce3bc59dd1e094fe68a42d61d3e/transformed/datastore-preferences-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.datastore:datastore-preferences:1.0.0] /Users/sarahtodd/.gradle/caches/9.1.0/transforms/c56dbce3bc59dd1e094fe68a42d61d3e/transformed/datastore-preferences-1.0.0/AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.navigation:navigation-runtime-android:2.9.7] /Users/sarahtodd/.gradle/caches/9.1.0/transforms/423aead62e53daaeb5ba9f009e7f65d8/transformed/navigation-runtime-release/AndroidManifest.xml:20:5-44
 MERGED from [androidx.navigation:navigation-runtime-android:2.9.7] /Users/sarahtodd/.gradle/caches/9.1.0/transforms/423aead62e53daaeb5ba9f009e7f65d8/transformed/navigation-runtime-release/AndroidManifest.xml:20:5-44
 MERGED from [androidx.navigation:navigation-common-android:2.9.7] /Users/sarahtodd/.gradle/caches/9.1.0/transforms/7753cac9c0204514a9272231ed43575c/transformed/navigation-common-release/AndroidManifest.xml:20:5-44
@@ -261,6 +265,8 @@ MERGED from [androidx.customview:customview-poolingcontainer:1.0.0] /Users/sarah
 MERGED from [androidx.customview:customview-poolingcontainer:1.0.0] /Users/sarahtodd/.gradle/caches/9.1.0/transforms/d82b6b492400cd83f958999d895948ad/transformed/customview-poolingcontainer-1.0.0/AndroidManifest.xml:20:5-21:38
 MERGED from [androidx.core:core-ktx:1.18.0] /Users/sarahtodd/.gradle/caches/9.1.0/transforms/90b32d50f85ac3422c2877bb5879e30d/transformed/core-ktx-1.18.0/AndroidManifest.xml:5:5-44
 MERGED from [androidx.core:core-ktx:1.18.0] /Users/sarahtodd/.gradle/caches/9.1.0/transforms/90b32d50f85ac3422c2877bb5879e30d/transformed/core-ktx-1.18.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.datastore:datastore:1.0.0] /Users/sarahtodd/.gradle/caches/9.1.0/transforms/8fc887b51fd2bbbc9c6e6e406ceaf44b/transformed/datastore-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.datastore:datastore:1.0.0] /Users/sarahtodd/.gradle/caches/9.1.0/transforms/8fc887b51fd2bbbc9c6e6e406ceaf44b/transformed/datastore-1.0.0/AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.annotation:annotation-experimental:1.4.1] /Users/sarahtodd/.gradle/caches/9.1.0/transforms/103519ff25f078946e745c4dac3712e4/transformed/annotation-experimental-1.4.1/AndroidManifest.xml:5:5-44
 MERGED from [androidx.annotation:annotation-experimental:1.4.1] /Users/sarahtodd/.gradle/caches/9.1.0/transforms/103519ff25f078946e745c4dac3712e4/transformed/annotation-experimental-1.4.1/AndroidManifest.xml:5:5-44
 MERGED from [androidx.core:core-viewtree:1.0.0] /Users/sarahtodd/.gradle/caches/9.1.0/transforms/01a66aa0dad1716b760c65f6dab95a9e/transformed/core-viewtree-1.0.0/AndroidManifest.xml:5:5-44
