@@ -1,33 +1,29 @@
 package site.jwojcik.schmemory.ui
 
-import android.R.attr.tint
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,30 +31,30 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lint.kotlin.metadata.Visibility
+import site.jwojcik.schmemory.R
 import site.jwojcik.schmemory.data.SceneDataSource
 import site.jwojcik.schmemory.data.Script
 import site.jwojcik.schmemory.data.SpeechDataSource
 import site.jwojcik.schmemory.ui.theme.Blue
-import site.jwojcik.schmemory.ui.theme.Yellow
-import site.jwojcik.schmemory.R
-import site.jwojcik.schmemory.data.Speech
-import site.jwojcik.schmemory.data.SpeechLine
-import site.jwojcik.schmemory.ui.theme.Gray
 import site.jwojcik.schmemory.ui.theme.Green
 import site.jwojcik.schmemory.ui.theme.Purple
+import site.jwojcik.schmemory.ui.theme.Yellow
 
 enum class SchmemoryListType { SCENE, SPEECH }
 
@@ -70,9 +66,34 @@ fun ListScreen(
     onItemClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val scriptList = when (listType) {
-        SchmemoryListType.SCENE -> SceneDataSource().loadScenes()
-        else -> SpeechDataSource().loadSpeeches()
+    val sceneDataSource = remember { SceneDataSource() }
+    val speechDataSource = remember { SpeechDataSource() }
+
+    var scriptList by remember {
+        mutableStateOf<List<Script>>(
+            when (listType) {
+                SchmemoryListType.SCENE -> sceneDataSource.loadScenes()
+                else -> speechDataSource.loadSpeeches()
+            }
+        )
+    }
+
+    var searchQuery by remember { mutableStateOf("") }
+    var isSearchActive by remember { mutableStateOf(false) }
+    var isSelectionMode by remember { mutableStateOf(false) }
+    val selectedItems = remember { mutableStateListOf<Int>() }
+    var showAddDialog by remember { mutableStateOf(false) }
+    var showDeleteConfirmDialog by remember { mutableStateOf(false) }
+    var newItemName by remember { mutableStateOf("") }
+    var addDialogMode by remember { mutableStateOf("create") } // "create" or "import"
+
+    val displayList = if (searchQuery.isNotEmpty()) {
+        when (listType) {
+            SchmemoryListType.SCENE -> sceneDataSource.searchScenes(searchQuery)
+            else -> speechDataSource.searchSpeeches(searchQuery)
+        }
+    } else {
+        scriptList
     }
 
     Scaffold(
@@ -81,10 +102,26 @@ fun ListScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    if ("${listType.name}".equals("SPEECH")) {
-                        Text(text = "Speeches")
+                    if (isSearchActive) {
+                        TextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            placeholder = { Text("Search...") },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(end = 8.dp),
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color.White,
+                                unfocusedContainerColor = Color.White,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent
+                            ),
+                            singleLine = true
+                        )
                     } else {
-                        Text(text = "Scenes")
+                        Text(
+                            text = if ("${listType.name}".equals("SPEECH")) "Speeches" else "Scenes"
+                        )
                     }
                 },
                 navigationIcon = {
@@ -100,16 +137,37 @@ fun ListScreen(
                     containerColor = Blue
                 ),
                 actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    // Search button (toggle search, clear on deactivate)
+                    IconButton(onClick = {
+                        isSearchActive = !isSearchActive
+                        if (!isSearchActive) {
+                            searchQuery = ""
+                        }
+                    }) {
                         Icon(Icons.Filled.Search, contentDescription = "Search")
                     }
-                    IconButton(onClick = { /*TODO*/ }) {
-                        // Make this more obviously add button
+                    // Add button
+                    IconButton(onClick = { showAddDialog = true }) {
                         Icon(Icons.Filled.AddCircle, contentDescription = "Add")
                     }
-                    IconButton(onClick = { /*TODO*/ }) {
-                        // select multiple for deletion
-                        Icon(Icons.Filled.CheckCircle, contentDescription = "Select")
+                    // Select button (with color change when active)
+                    IconButton(onClick = {
+                        isSelectionMode = !isSelectionMode
+                        if (!isSelectionMode) {
+                            selectedItems.clear()
+                        }
+                    }) {
+                        Icon(
+                            Icons.Filled.CheckCircle,
+                            contentDescription = "Select",
+                            tint = if (isSelectionMode) Green else Color.Unspecified
+                        )
+                    }
+                    // Delete button (only show if items are selected)
+                    if (selectedItems.isNotEmpty()) {
+                        IconButton(onClick = { showDeleteConfirmDialog = true }) {
+                            Icon(Icons.Filled.Delete, contentDescription = "Delete")
+                        }
                     }
                 },
                 modifier = modifier
@@ -121,26 +179,177 @@ fun ListScreen(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            // Make items span entire width of screen, left side have "play" button. all the way to the right an edit button and a view button
-            ItemList(itemList = scriptList, onItemClick)
+            // Items list
+            ItemList(
+                itemList = displayList,
+                onItemClick = onItemClick,
+                isSelectionMode = isSelectionMode,
+                selectedItems = selectedItems
+            )
         }
+    }
+
+    // Add Item Dialog
+    if (showAddDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showAddDialog = false
+                newItemName = ""
+                addDialogMode = "create"
+            },
+            title = {
+                Column {
+                    Text("Add New ${if (listType == SchmemoryListType.SPEECH) "Speech" else "Scene"}")
+                    // Mode selector buttons
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Button(
+                            onClick = { addDialogMode = "create" },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (addDialogMode == "create") Blue else Color.LightGray
+                            )
+                        ) {
+                            Text("Create New", color = if (addDialogMode == "create") Color.White else Color.Black)
+                        }
+                        Button(
+                            onClick = { addDialogMode = "import" },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (addDialogMode == "import") Blue else Color.LightGray
+                            )
+                        ) {
+                            Text("Import", color = if (addDialogMode == "import") Color.White else Color.Black)
+                        }
+                    }
+                }
+            },
+            text = {
+                when (addDialogMode) {
+                    "create" -> {
+                        Column {
+                            Text("Enter a name for the new item:")
+                            TextField(
+                                value = newItemName,
+                                onValueChange = { newItemName = it },
+                                placeholder = { Text("Item name") },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 8.dp)
+                            )
+                        }
+                    }
+                    "import" -> {
+                        Column {
+                            Text("Import functionality coming soon")
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                if (addDialogMode == "create") {
+                    Button(
+                        onClick = {
+                            if (newItemName.isNotBlank()) {
+                                when (listType) {
+                                    SchmemoryListType.SCENE -> {
+                                        sceneDataSource.addScene(newItemName)
+                                        scriptList = sceneDataSource.loadScenes()
+                                    }
+                                    else -> {
+                                        speechDataSource.addSpeech(newItemName)
+                                        scriptList = speechDataSource.loadSpeeches()
+                                    }
+                                }
+                                showAddDialog = false
+                                newItemName = ""
+                                addDialogMode = "create"
+                            }
+                        }
+                    ) {
+                        Text("Create")
+                    }
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showAddDialog = false
+                    newItemName = ""
+                    addDialogMode = "create"
+                }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    // Delete Confirmation Dialog
+    if (showDeleteConfirmDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirmDialog = false },
+            title = { Text("Delete Items?") },
+            text = {
+                Text("Are you sure you want to delete ${selectedItems.size} item(s)? This cannot be undone.")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        when (listType) {
+                            SchmemoryListType.SCENE -> {
+                                sceneDataSource.deleteSceneList(selectedItems.toList())
+                                scriptList = sceneDataSource.loadScenes()
+                            }
+
+                            else -> {
+                                speechDataSource.deleteSpeechList(selectedItems.toList())
+                                scriptList = speechDataSource.loadSpeeches()
+                            }
+                        }
+                        selectedItems.clear()
+                        isSelectionMode = false
+                        showDeleteConfirmDialog = false
+                    }
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteConfirmDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
 
 @Composable
 fun ItemList(
     itemList: List<Script>,
-    onItemClick: (Int) -> Unit
+    onItemClick: (Int) -> Unit,
+    isSelectionMode: Boolean = false,
+    selectedItems: MutableList<Int> = mutableListOf()
 ) {
     LazyColumn {
         items(
             items = itemList,
             key = { script -> script.id }
         ) { script ->
-
             ScriptCard(
                 script = script,
-                onItemClick
+                onItemClick = onItemClick,
+                isSelectionMode = isSelectionMode,
+                isSelected = script.id in selectedItems,
+                onSelectionChange = { selected ->
+                    if (selected) {
+                        selectedItems.add(script.id)
+                    } else {
+                        selectedItems.remove(script.id)
+                    }
+                }
             )
         }
     }
@@ -151,14 +360,24 @@ fun ItemList(
 fun ScriptCard(
     script: Script,
     onItemClick: (Int) -> Unit,
+    isSelectionMode: Boolean = false,
+    isSelected: Boolean = false,
+    onSelectionChange: (Boolean) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
             .padding(8.dp)
             .fillMaxWidth()
-            .border(width = 3.dp, color = Purple),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+            .border(width = 3.dp, color = if (isSelected) Green else Purple)
+            .clickable(enabled = isSelectionMode) {
+                if (isSelectionMode) {
+                    onSelectionChange(!isSelected)
+                }
+            },
+        colors = CardDefaults.cardColors(
+            containerColor = if (isSelected) Green.copy(alpha = 0.3f) else Color.White
+        )
     ) {
         Row(
             modifier = Modifier
@@ -166,14 +385,22 @@ fun ScriptCard(
                 .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Play Button (Left-most)
-            IconButton(
-                onClick = { /* TODO */ }
-            ) {
-                Icon(Icons.Filled.PlayArrow, contentDescription = "Play")
+            // Selection checkbox (only show in selection mode)
+            if (isSelectionMode) {
+                Checkbox(
+                    checked = isSelected,
+                    onCheckedChange = { onSelectionChange(it) }
+                )
+            } else {
+                // Play Button (Left-most)
+                IconButton(
+                    onClick = { /* TODO */ }
+                ) {
+                    Icon(Icons.Filled.PlayArrow, contentDescription = "Play")
+                }
             }
 
-            // Text immediately after the button)
+            // Text immediately after the button
             Text(
                 text = if (script.name.length > 24) "${script.name.take(24)}..." else script.name,
                 color = Color.Black,
@@ -183,14 +410,18 @@ fun ScriptCard(
                     .padding(start = 4.dp) // Add a tiny bit of space from the play button
             )
 
-            // Edit and Info Buttons (Right-most)
-            IconButton(onClick = { /* TODO */ }) {
-                Icon(Icons.Filled.Edit, contentDescription = "Edit")
-            }
-            IconButton(onClick = { /* TODO */ }) {
-                //Make a little eyeball icon
-                //Icon(Icons.Filled.Info, contentDescription = "View")
-                Icon(painter = painterResource(id = R.drawable.anya), contentDescription = "View Placeholder", tint = Color.Unspecified)
+            // Edit and Info Buttons (Right-most, only show when not in selection mode)
+            if (!isSelectionMode) {
+                IconButton(onClick = { /* TODO */ }) {
+                    Icon(Icons.Filled.Edit, contentDescription = "Edit")
+                }
+                IconButton(onClick = { /* TODO */ }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.anya),
+                        contentDescription = "View Placeholder",
+                        tint = Color.Unspecified
+                    )
+                }
             }
         }
     }

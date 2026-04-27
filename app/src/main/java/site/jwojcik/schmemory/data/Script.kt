@@ -1,5 +1,7 @@
 package site.jwojcik.schmemory.data
 
+import kotlinx.serialization.Serializable
+
 interface Script {
     val id: Int
     val name: String
@@ -10,15 +12,18 @@ interface Line {
     val text: String
 }
 
+@Serializable
 data class SpeechLine (
     override val text: String
 ) : Line;
 
+@Serializable
 data class SceneLine (
     val characterName: String,
     override val text: String
 ) : Line;
 
+@Serializable
 data class Scene (
     override val id: Int = 0,
     override val name: String,
@@ -26,6 +31,7 @@ data class Scene (
     override val lines: List<SceneLine>
 ) : Script;
 
+@Serializable
 data class Speech (
     override val id: Int = 0,
     override val name: String,

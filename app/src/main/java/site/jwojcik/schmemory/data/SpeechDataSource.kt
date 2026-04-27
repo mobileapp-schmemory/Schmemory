@@ -1,7 +1,7 @@
 package site.jwojcik.schmemory.data
 
-class SpeechDataSource {
-    private var speechList = listOf<Speech>(
+class SpeechDataSource(private val storage: PreferenceStorage? = null) {
+    private var speechList = mutableListOf<Speech>(
         Speech(
             id = 0,
             name = "Window Scene (Excerpt, as speech)",
@@ -114,4 +114,39 @@ class SpeechDataSource {
     }
 
     fun loadSpeeches() = speechList
+
+    fun addSpeech(name: String): Speech {
+        val newId = (speechList.maxOfOrNull { it.id } ?: -1) + 1
+        val newSpeech = Speech(
+            id = newId,
+            name = name,
+            lines = listOf()
+        )
+        speechList.add(newSpeech)
+        storage?.saveSpeechList(speechList)
+        return newSpeech
+    }
+
+    fun deleteSpeech(id: Int) {
+        speechList.removeAll { it.id == id }
+        storage?.saveSpeechList(speechList)
+    }
+
+    fun deleteSpeechList(ids: List<Int>) {
+        speechList.removeAll { it.id in ids }
+        storage?.saveSpeechList(speechList)
+    }
+
+    fun updateSpeechName(id: Int, newName: String) {
+        val index = speechList.indexOfFirst { it.id == id }
+        if (index != -1) {
+            val speech = speechList[index]
+            speechList[index] = speech.copy(name = newName)
+            storage?.saveSpeechList(speechList)
+        }
+    }
+
+    fun searchSpeeches(query: String): List<Speech> {
+        return speechList.filter { it.name.contains(query, ignoreCase = true) }
+    }
 }
