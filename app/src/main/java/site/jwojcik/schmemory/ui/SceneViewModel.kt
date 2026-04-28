@@ -1,5 +1,7 @@
 package site.jwojcik.schmemory.ui
 
+import androidx.compose.remote.creation.first
+import androidx.compose.ui.geometry.isEmpty
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -9,6 +11,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.toRoute
+import androidx.preference.isNotEmpty
+import androidx.preference.size
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -17,11 +21,9 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.stateIn
 import site.jwojcik.schmemory.Routes
 import site.jwojcik.schmemory.SchmemoryApplication
-import site.jwojcik.schmemory.data.SceneDataSource
+import site.jwojcik.schmemory.data.Scene
+import site.jwojcik.schmemory.data.SceneLine
 import site.jwojcik.schmemory.data.SchmemoryRepository
-import site.jwojcik.schmemory.data.SpeechDataSource
-import kotlin.collections.get
-
 
 class SceneViewModel(
     savedStateHandle: SavedStateHandle,
@@ -32,71 +34,79 @@ class SceneViewModel(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = (this[APPLICATION_KEY] as SchmemoryApplication)
-                SceneScreen(this.createSavedStateHandle(), application.schmemoryRepository)
+                // Corrected: Call SceneViewModel constructor, not SceneScreen
+                SceneViewModel(this.createSavedStateHandle(), application.schmemoryRepository)
             }
         }
     }
 
-    // Get from composable's route arguments
     private val sceneId: Long = savedStateHandle.toRoute<Routes.Scene>().sceneId
 
     private val currLineNum = MutableStateFlow(1)
-    private val currLine = MutableStateFlow(Line(id = 0L))
+    private val currLine = MutableStateFlow(
+        SceneLine(id = 0L, sceneId = 0, order = 0, characterName = "", text = "")
+    )
     private val answerVisible = MutableStateFlow(true)
 
-    val uiState: StateFlow<QuestionScreenUiState> =
+    // Corrected: Consistent naming with SceneLineScreenUiState
+    val uiState: StateFlow<SceneLineScreenUiState> =
         combine(
-            studyRepo.getSubject(subjectId).filterNotNull(),
-            studyRepo.getQuestions(subjectId),
-            currQuestionNum,
-            currQuestion,
+            schmRepo.getScene(sceneId).filterNotNull(),
+            schmRepo.getSceneLines(sceneId),
+            currLineNum,
+            currLine,
             answerVisible
-        ) { subject, questions, currNum, currQuest, ansVisible ->
-            QuestionScreenUiState(
-                subject = subject,
-                questionList = questions,
-                currQuestion =
-                    if (currQuest.id == 0L && questions.isNotEmpty()) questions.first()
-                    else if (questions.isEmpty()) currQuest
-                    else questions[currNum - 1],
-                currQuestionNum = currNum,
-                totalQuestions = questions.size,
+        ) { scene, lines, currNum, line, ansVisible ->
+            SceneLineScreenUiState(
+                scene = scene,
+                lineList = lines,
+                currSceneLine = if (line.id == 0L && lines.isNotEmpty()) lines.first()
+                else if (lines.isEmpty()) line
+                else lines.getOrElse(currNum - 1) { lines.first() },
+                currSceneLineNum = currNum,
+                totalSceneLines = lines.size,
                 answerVisible = ansVisible
             )
         }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000L),
-                initialValue = QuestionScreenUiState(),
+                // Corrected: Added required initial values
+                initialValue = SceneLineScreenUiState(
+                    scene = Scene(0, ""),
+                    currSceneLine = SceneLine(0, 0, 0, "", "")
+                )
             )
 
-    fun prevQuestion() {
-        val index = (uiState.value.currQuestionNum - 2 + uiState.value.totalQuestions) %
-                uiState.value.totalQuestions
-        currQuestion.value = uiState.value.questionList[index]
-        currQuestionNum.value = index + 1
+    fun prevSceneLine() {
+        if (uiState.value.totalSceneLines == 0) return
+        val index = (uiState.value.currSceneLineNum - 2 + uiState.value.totalSceneLines) %
+                uiState.value.totalSceneLines
+        currLine.value = uiState.value.lineList[index]
+        currLineNum.value = index + 1
     }
 
-    fun nextQuestion() {
-        val index = uiState.value.currQuestionNum % uiState.value.totalQuestions
-        currQuestion.value = uiState.value.questionList[index]
-        currQuestionNum.value = index + 1
-    }
-
-    fun deleteQuestion() {
-        // TODO: Complete this function
+    fun nextSceneLine() {
+        if (uiState.value.totalSceneLines == 0) return
+        val index = uiState.value.currSceneLineNum % uiState.value.totalSceneLines
+        currLine.value = uiState.value.lineList[index]
+        currLineNum.value = index + 1
     }
 
     fun toggleAnswer() {
         answerVisible.value = !answerVisible.value
     }
+
+    fun deleteSceneLine() {
+        // TODO: Complete this function
+    }
 }
 
-data class QuestionScreenUiState(
-    val subject: Subject = Subject(),
-    val currQuestion: Question = Question(),
-    val questionList: List<Question> = emptyList(),
-    val currQuestionNum: Int = 1,
-    val totalQuestions: Int = 0,
+data class SceneLineScreenUiState(
+    val scene: Scene,
+    val currSceneLine: SceneLine,
+    val lineList: List<SceneLine> = emptyList(),
+    val currSceneLineNum: Int = 1,
+    val totalSceneLines: Int = 0,
     val answerVisible: Boolean = true
 )
