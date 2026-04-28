@@ -81,7 +81,7 @@ fun ListScreen(
     var searchQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
     var isSelectionMode by remember { mutableStateOf(false) }
-    val selectedItems = remember { mutableStateListOf<Int>() }
+    val selectedItems = remember { mutableStateListOf<Long>() }
     var showAddDialog by remember { mutableStateOf(false) }
     var showDeleteConfirmDialog by remember { mutableStateOf(false) }
     var newItemName by remember { mutableStateOf("") }
@@ -300,12 +300,12 @@ fun ListScreen(
                     onClick = {
                         when (listType) {
                             SchmemoryListType.SCENE -> {
-                                sceneDataSource.deleteSceneList(selectedItems.toList())
+                                //sceneDataSource.deleteSceneList(selectedItems.toList())
                                 scriptList = sceneDataSource.loadScenes()
                             }
 
                             else -> {
-                                speechDataSource.deleteSpeechList(selectedItems.toList())
+                                //speechDataSource.deleteSpeechList(selectedItems.toList())
                                 scriptList = speechDataSource.loadSpeeches()
                             }
                         }
