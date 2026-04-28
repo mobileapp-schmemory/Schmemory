@@ -63,7 +63,7 @@ enum class SchmemoryListType { SCENE, SPEECH }
 fun ListScreen(
     listType: SchmemoryListType,
     onUpClick: () -> Boolean,
-    onItemClick: (Int) -> Unit,
+    onItemClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val sceneDataSource = remember { SceneDataSource() }
@@ -329,9 +329,9 @@ fun ListScreen(
 @Composable
 fun ItemList(
     itemList: List<Script>,
-    onItemClick: (Int) -> Unit,
+    onItemClick: (Long) -> Unit,
     isSelectionMode: Boolean = false,
-    selectedItems: MutableList<Int> = mutableListOf()
+    selectedItems: MutableList<Long> = mutableListOf()
 ) {
     LazyColumn {
         items(
@@ -359,7 +359,7 @@ fun ItemList(
 @Composable
 fun ScriptCard(
     script: Script,
-    onItemClick: (Int) -> Unit,
+    onItemClick: (Long) -> Unit,
     isSelectionMode: Boolean = false,
     isSelected: Boolean = false,
     onSelectionChange: (Boolean) -> Unit = {},
