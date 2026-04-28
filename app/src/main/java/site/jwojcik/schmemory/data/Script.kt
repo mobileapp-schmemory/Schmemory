@@ -1,33 +1,65 @@
 package site.jwojcik.schmemory.data
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.PrimaryKey
+
 interface Script {
-    val id: Int
-    val name: String
-    val lines: List<Line>
+    var id: Long
+    var name: String
+    var creationTime: Long
 }
 
 interface Line {
-    val text: String
+    var id: Long
+    var text: String
 }
 
+@Entity(foreignKeys = [
+    ForeignKey(entity = Speech::class,
+        parentColumns = ["id"],
+        childColumns = ["speechId"],
+        onDelete = ForeignKey.CASCADE)
+])
 data class SpeechLine (
-    override val text: String
+    @PrimaryKey(autoGenerate = true)
+    override var id: Long = 0,
+    var speechId: Long = 0,
+    var order: Long = 0,
+    override var text: String
 ) : Line;
 
+@Entity(foreignKeys = [
+    ForeignKey(entity = Scene::class,
+        parentColumns = ["id"],
+        childColumns = ["sceneId"],
+        onDelete = ForeignKey.CASCADE)
+])
 data class SceneLine (
-    val characterName: String,
-    override val text: String
+    @PrimaryKey(autoGenerate = true)
+    override var id: Long = 0,
+    var sceneId: Long = 0,
+    var order: Long = 0,
+    var characterName: String,
+    override var text: String
 ) : Line;
 
+@Entity
 data class Scene (
-    override val id: Int = 0,
-    override val name: String,
-    val readingFor: String,
-    override val lines: List<SceneLine>
+    @PrimaryKey(autoGenerate = true)
+    override var id: Long = 0,
+    override var name: String,
+    var readingFor: String,
+    @ColumnInfo(name = "created")
+    override var creationTime: Long = System.currentTimeMillis()
 ) : Script;
 
+@Entity
 data class Speech (
-    override val id: Int = 0,
-    override val name: String,
-    override val lines: List<SpeechLine>
+    @PrimaryKey(autoGenerate = true)
+    override var id: Long = 0,
+    override var name: String,
+    @ColumnInfo(name = "created")
+    override var creationTime: Long = System.currentTimeMillis()
 ) : Script;

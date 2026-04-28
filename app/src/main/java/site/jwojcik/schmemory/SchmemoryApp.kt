@@ -1,11 +1,15 @@
 package site.jwojcik.schmemory
 
+import android.app.Application
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
+import site.jwojcik.schmemory.data.SceneDataSource
+import site.jwojcik.schmemory.data.SchmemoryRepository
+import site.jwojcik.schmemory.data.SpeechDataSource
 import site.jwojcik.schmemory.ui.HomeScreen
 import site.jwojcik.schmemory.ui.ListScreen
 import site.jwojcik.schmemory.ui.SceneScreen
@@ -22,7 +26,7 @@ sealed class Routes {
 
     @Serializable
     data class Speech(
-        val speechId: Int
+        val speechId: Long
     )
 
     @Serializable
@@ -30,7 +34,7 @@ sealed class Routes {
 
     @Serializable
     data class Scene(
-        val sceneId: Int
+        val sceneId: Long
     )
 
     @Serializable
@@ -77,7 +81,7 @@ fun SchmemoryApp() {
                 onUpClick = {
                     navController.navigateUp()
                 },
-                onItemClick = { speechId: Int ->
+                onItemClick = { speechId: Long ->
                     navController.navigate(
                         Routes.Speech(speechId)
                     )
@@ -101,7 +105,7 @@ fun SchmemoryApp() {
                 onUpClick = {
                     navController.navigateUp()
                 },
-                onItemClick = { sceneId: Int ->
+                onItemClick = { sceneId: Long ->
                     navController.navigate(
                         Routes.Scene(sceneId)
                     )
@@ -109,14 +113,26 @@ fun SchmemoryApp() {
             )
         }
         composable<Routes.Scene> { backstackEntry ->
-            val speech: Routes.Scene = backstackEntry.toRoute()
+            val scene: Routes.Scene = backstackEntry.toRoute()
 
             SceneScreen(
-                sceneId = speech.sceneId,
+                sceneId = scene.sceneId,
                 onUpClick = {
                     navController.navigateUp()
                 }
             )
         }
+    }
+}
+
+class SchmemoryApplication: Application() {
+    // Needed to create ViewModels with the ViewModelProvider.Factory
+    lateinit var schmemoryRepository: SchmemoryRepository
+
+    // For onCreate() to run, android:name=".StudyHelperApplication" must
+    // be added to <application> in AndroidManifest.xml
+    override fun onCreate() {
+        super.onCreate()
+        schmemoryRepository = SchmemoryRepository(this.applicationContext)
     }
 }

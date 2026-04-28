@@ -1,6 +1,8 @@
 package site.jwojcik.schmemory.data
 
-class SceneDataSource {
+import android.content.Context
+
+class SceneDataSource (applicationContext: Context?) {
     private var sceneList = listOf<Scene>(
         Scene(
             id = 0,
@@ -96,7 +98,7 @@ class SceneDataSource {
         )
     );
 
-    fun getScene(id: Int): Scene? {
+    fun getScene(id: Long): Scene? {
         return sceneList.find { it.id == id }
     }
 

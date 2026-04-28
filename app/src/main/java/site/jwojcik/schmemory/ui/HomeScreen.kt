@@ -33,19 +33,6 @@ fun HomeScreen(
     onSpeechesClick: () -> Unit,
     onSettingsClick: () -> Unit
 ) {
-    HomePageScreen(
-        onScenesClick = onScenesClick,
-        onSpeechesClick = onSpeechesClick,
-        onSettingsClick = onSettingsClick
-    )
-}
-
-@Composable
-fun HomePageScreen(
-    onScenesClick: () -> Unit,
-    onSpeechesClick: () -> Unit,
-    onSettingsClick: () -> Unit
-) {
     var showSmallButtons by remember {mutableStateOf(false)}
     Box(
         // Box Holding All The Buttons

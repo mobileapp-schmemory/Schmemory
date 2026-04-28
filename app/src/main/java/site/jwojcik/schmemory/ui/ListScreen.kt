@@ -1,5 +1,6 @@
 package site.jwojcik.schmemory.ui
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -50,7 +51,7 @@ enum class SchmemoryListType { SCENE, SPEECH }
 fun ListScreen(
     listType: SchmemoryListType,
     onUpClick: () -> Boolean,
-    onItemClick: (Int) -> Unit,
+    onItemClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scriptList = when (listType) {
@@ -61,7 +62,7 @@ fun ListScreen(
     Scaffold(containerColor = Yellow,
         modifier = modifier,
         topBar = { TopAppBar(
-            title = { if("${listType.name}".equals("SPEECH")) {
+            title = { if(listType == SchmemoryListType.SPEECH) {
                 Text(text = "Speeches")
             } else {
                 Text(text = "Scenes")
@@ -100,7 +101,7 @@ fun ListScreen(
 @Composable
 fun ItemList(
     itemList: List<Script>,
-    onItemClick: (Int) -> Unit
+    onItemClick: (Long) -> Unit
 ) {
     LazyColumn {
         items(
@@ -119,7 +120,7 @@ fun ItemList(
 @Composable
 fun ScriptCard(
     script: Script,
-    onItemClick: (Int) -> Unit,
+    onItemClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(

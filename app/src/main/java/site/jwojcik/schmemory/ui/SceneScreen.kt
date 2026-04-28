@@ -23,18 +23,33 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.createSavedStateHandle
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import site.jwojcik.schmemory.SchmemoryApplication
 import site.jwojcik.schmemory.data.Line
 import site.jwojcik.schmemory.data.SceneDataSource
 import site.jwojcik.schmemory.data.SceneLine
+import site.jwojcik.schmemory.data.SchmemoryRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SceneScreen(
-    sceneId: Int,
+    sceneId: Long,
     onUpClick: () -> Boolean,
-    modifier: Modifier = Modifier,
-    sceneDataSource: SceneDataSource = SceneDataSource()
+    modifier: Modifier = Modifier
 ) {
+
+    companion object {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val application = (this[APPLICATION_KEY] as SchmemoryApplication)
+                SceneScreen(this.createSavedStateHandle(), application.schmemoryRepository)
+            }
+        }
+    }
     val scene = sceneDataSource.getScene(sceneId)
     Scaffold(
         topBar = {

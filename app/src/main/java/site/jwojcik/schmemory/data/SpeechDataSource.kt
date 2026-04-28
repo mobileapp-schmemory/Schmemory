@@ -1,6 +1,8 @@
 package site.jwojcik.schmemory.data
 
-class SpeechDataSource {
+import android.content.Context
+
+class SpeechDataSource(applicationContext: Context) {
     private var speechList = listOf<Speech>(
         Speech(
             id = 0,
@@ -109,7 +111,7 @@ class SpeechDataSource {
         )
     );
 
-    fun getSpeech(id: Int): Speech? {
+    fun getSpeech(id: Long): Speech? {
         return speechList.find { it.id == id }
     }
 
