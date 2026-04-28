@@ -6,7 +6,7 @@
 
     <uses-sdk
         android:minSdkVersion="24"
-        android:targetSdkVersion="36" />
+        android:targetSdkVersion="35" />
 
     <permission
         android:name="site.jwojcik.schmemory.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
@@ -38,16 +38,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name="androidx.room.MultiInstanceInvalidationService"
+            android:directBootAware="true"
+            android:exported="false" />
+
         <activity
             android:name="androidx.compose.ui.tooling.PreviewActivity"
             android:exported="true" />
-
-        <uses-library
-            android:name="androidx.window.extensions"
-            android:required="false" />
-        <uses-library
-            android:name="androidx.window.sidecar"
-            android:required="false" />
 
         <provider
             android:name="androidx.startup.InitializationProvider"
@@ -66,8 +65,7 @@
 
         <activity
             android:name="androidx.activity.ComponentActivity"
-            android:exported="true"
-            android:theme="@android:style/Theme.Material.Light.NoActionBar" />
+            android:exported="true" />
 
         <receiver
             android:name="androidx.profileinstaller.ProfileInstallReceiver"
