@@ -43,7 +43,7 @@ android {
 
 dependencies {
     implementation("androidx.room:room-runtime:2.7.1")
-    implementation(libs.androidx.compose.remote.creation.core)
+    implementation("androidx.graphics:graphics-shapes:1.0.1")
     ksp("androidx.room:room-compiler:2.7.1")
     implementation("androidx.room:room-ktx:2.7.1")
     implementation(libs.kotlinx.serialization.json)
@@ -65,4 +65,5 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation("androidx.datastore:datastore-preferences:1.1.2")
 }
