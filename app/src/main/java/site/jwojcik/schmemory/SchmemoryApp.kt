@@ -6,13 +6,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.zybooks.studyhelper.ui.sceneLine.SceneScreen
 import kotlinx.serialization.Serializable
-import site.jwojcik.schmemory.data.SceneDataSource
 import site.jwojcik.schmemory.data.SchmemoryRepository
-import site.jwojcik.schmemory.data.SpeechDataSource
 import site.jwojcik.schmemory.ui.HomeScreen
 import site.jwojcik.schmemory.ui.ListScreen
-import site.jwojcik.schmemory.ui.SceneScreen
 import site.jwojcik.schmemory.ui.SchmemoryListType
 import site.jwojcik.schmemory.ui.SettingsScreen
 import site.jwojcik.schmemory.ui.SpeechScreen

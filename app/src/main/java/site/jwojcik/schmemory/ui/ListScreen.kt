@@ -48,9 +48,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import site.jwojcik.schmemory.R
-import site.jwojcik.schmemory.data.SceneDataSource
 import site.jwojcik.schmemory.data.Script
-import site.jwojcik.schmemory.data.SpeechDataSource
 import site.jwojcik.schmemory.ui.theme.Blue
 import site.jwojcik.schmemory.ui.theme.Green
 import site.jwojcik.schmemory.ui.theme.Purple
