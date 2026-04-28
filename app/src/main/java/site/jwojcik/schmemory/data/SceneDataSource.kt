@@ -1,9 +1,7 @@
 package site.jwojcik.schmemory.data
 
-import android.content.Context
-
-class SceneDataSource (applicationContext: Context?) {
-    private var sceneList = listOf<Scene>(
+class SceneDataSource(private val storage: PreferenceStorage? = null) {
+    private var sceneList = mutableListOf<Scene>(
         Scene(
             id = 0,
             name = "Window Scene (Excerpt)",
@@ -98,9 +96,45 @@ class SceneDataSource (applicationContext: Context?) {
         )
     );
 
-    fun getScene(id: Long): Scene? {
+    fun getScene(id: Int): Scene? {
         return sceneList.find { it.id == id }
     }
 
     fun loadScenes() = sceneList
+
+    fun addScene(name: String, readingFor: String = ""): Scene {
+        val newId = (sceneList.maxOfOrNull { it.id } ?: -1) + 1
+        val newScene = Scene(
+            id = newId,
+            name = name,
+            readingFor = readingFor,
+            lines = listOf()
+        )
+        sceneList.add(newScene)
+        storage?.saveSceneList(sceneList)
+        return newScene
+    }
+
+    fun deleteScene(id: Int) {
+        sceneList.removeAll { it.id == id }
+        storage?.saveSceneList(sceneList)
+    }
+
+    fun deleteSceneList(ids: List<Int>) {
+        sceneList.removeAll { it.id in ids }
+        storage?.saveSceneList(sceneList)
+    }
+
+    fun updateSceneName(id: Int, newName: String) {
+        val index = sceneList.indexOfFirst { it.id == id }
+        if (index != -1) {
+            val scene = sceneList[index]
+            sceneList[index] = scene.copy(name = newName)
+            storage?.saveSceneList(sceneList)
+        }
+    }
+
+    fun searchScenes(query: String): List<Scene> {
+        return sceneList.filter { it.name.contains(query, ignoreCase = true) }
+    }
 }
