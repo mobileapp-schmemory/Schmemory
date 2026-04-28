@@ -10,7 +10,7 @@ interface SpeechLineDao {
     fun getSpeechLine(id: Long): Flow<SpeechLine?>
 
     @Query("SELECT * FROM SpeechLine WHERE speechId = :speechId")
-    fun getSpeechLines(speechId: Long): Flow<SpeechLine?>
+    fun getSpeechLines(speechId: Long): Flow<List<SpeechLine>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addSpeechLine(speechLine: SpeechLine): Long

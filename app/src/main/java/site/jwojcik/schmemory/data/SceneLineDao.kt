@@ -10,7 +10,7 @@ interface SceneLineDao {
     fun getSceneLine(id: Long): Flow<SceneLine?>
 
     @Query("SELECT * FROM SceneLine WHERE sceneId = :sceneId")
-    fun getSceneLines(sceneId: Long): Flow<SceneLine?>
+    fun getSceneLines(sceneId: Long): Flow<List<SceneLine>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addSceneLine(sceneLine: SceneLine): Long
