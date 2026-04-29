@@ -86,7 +86,11 @@ fun SceneScreen(
                     
                     Button(
                         onClick = viewModel::toggleAnswer,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Blue)
+                        enabled = uiState.isUserLine,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (uiState.isUserLine) Color.White else Color.White.copy(alpha = 0.5f),
+                            contentColor = Blue
+                        )
                     ) {
                         Text(if (uiState.answerVisible) "Hide Line" else "Reveal Line")
                     }
@@ -124,9 +128,11 @@ fun RehearsalContent(
 ) {
     val listState = rememberLazyListState()
 
+    // Automatically scroll to the bottom when new lines are added or your line is revealed
     LaunchedEffect(previousLines.size, answerVisible) {
-        if (previousLines.isNotEmpty()) {
-            listState.animateScrollToItem(previousLines.size)
+        if (previousLines.isNotEmpty() || answerVisible) {
+            val lastIndex = if (answerVisible) previousLines.size else (previousLines.size - 1).coerceAtLeast(0)
+            listState.animateScrollToItem(lastIndex)
         }
     }
 
@@ -146,7 +152,7 @@ fun RehearsalContent(
                         text = currentLine.characterName.uppercase(),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
-                        color = Color.DarkGray
+                        color = if (currentLine.characterName.equals(readingFor, ignoreCase = true)) Blue else Color.DarkGray
                     )
                     if (answerVisible) {
                         Text(
@@ -160,7 +166,7 @@ fun RehearsalContent(
                             modifier = Modifier
                                 .padding(top = 4.dp)
                                 .fillMaxWidth()
-                                .height(40.dp)
+                                .height(48.dp)
                                 .background(Color.LightGray.copy(alpha = 0.3f))
                         )
                     }

@@ -134,7 +134,6 @@ fun ListScreen(
                     containerColor = Blue
                 ),
                 actions = {
-                    // Search button (toggle search, clear on deactivate)
                     IconButton(onClick = {
                         isSearchActive = !isSearchActive
                         if (!isSearchActive) {
@@ -143,11 +142,9 @@ fun ListScreen(
                     }) {
                         Icon(Icons.Filled.Search, contentDescription = "Search")
                     }
-                    // Add button
                     IconButton(onClick = { showAddDialog = true }) {
                         Icon(Icons.Filled.AddCircle, contentDescription = "Add")
                     }
-                    // Select button (with color change when active)
                     IconButton(onClick = {
                         isSelectionMode = !isSelectionMode
                         if (!isSelectionMode) {
@@ -160,7 +157,6 @@ fun ListScreen(
                             tint = if (isSelectionMode) Green else Color.Unspecified
                         )
                     }
-                    // Delete button (only show if items are selected)
                     if (selectedItems.isNotEmpty()) {
                         IconButton(onClick = { showDeleteConfirmDialog = true }) {
                             Icon(Icons.Filled.Delete, contentDescription = "Delete")
@@ -176,7 +172,6 @@ fun ListScreen(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            // Items list
             ItemList(
                 itemList = displayList,
                 listType = listType,
@@ -189,7 +184,6 @@ fun ListScreen(
         }
     }
 
-    // Add Item Dialog
     if (showAddDialog) {
         AlertDialog(
             onDismissRequest = {
@@ -205,7 +199,6 @@ fun ListScreen(
             title = {
                 Column {
                     Text("Add New ${if (listType == SchmemoryListType.SPEECH) "Speech" else "Scene"}")
-                    // Mode selector buttons
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -346,16 +339,11 @@ fun ListScreen(
                 }
             },
             dismissButton = {
-                TextButton(onClick = {
-                    showAddDialog = false
-                    newItemName = ""
-                    readingFor = ""
-                    addDialogMode = "create"
-                }) {
                 TextButton(
                     onClick = {
                         showAddDialog = false
                         newItemName = ""
+                        readingFor = ""
                         importUrl = ""
                         addDialogMode = "create"
                         importError = null
@@ -368,7 +356,6 @@ fun ListScreen(
         )
     }
 
-    // Delete Confirmation Dialog
     if (showDeleteConfirmDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirmDialog = false },
@@ -383,7 +370,6 @@ fun ListScreen(
                             SchmemoryListType.SCENE -> {
                                 viewModel.deleteSelectedScenes()
                             }
-
                             else -> {
                                 viewModel.deleteSelectedSpeeches()
                             }
@@ -473,14 +459,12 @@ fun ScriptCard(
                 .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Selection checkbox (only show in selection mode)
             if (isSelectionMode) {
                 Checkbox(
                     checked = isSelected,
                     onCheckedChange = { onSelectionChange(it) }
                 )
             } else {
-                // Play Button (Left-most)
                 IconButton(
                     onClick = { onItemClick(script.id) }
                 ) {

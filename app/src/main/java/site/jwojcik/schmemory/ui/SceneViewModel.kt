@@ -14,7 +14,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import site.jwojcik.schmemory.Routes
 import site.jwojcik.schmemory.SchmemoryApplication
 import site.jwojcik.schmemory.data.Scene
@@ -36,7 +38,6 @@ class SceneViewModel(
     }
 
     private val sceneId: Long = savedStateHandle.toRoute<Routes.Scene>().sceneId
-
     private val currLineNum = MutableStateFlow(1)
     private val answerVisible = MutableStateFlow(false)
 
@@ -51,25 +52,17 @@ class SceneViewModel(
             val currentLineIndex = (currNum - 1).coerceIn(0, (sortedLines.size - 1).coerceAtLeast(0))
             val currentLine = if (sortedLines.isNotEmpty()) sortedLines[currentLineIndex] else null
             
-            // Filter for lines BEFORE the current line that belong to other characters
-            // and lines for the current character that we've already passed? 
-            // Actually, the request says "present the lines before the character's line who's being read for"
-            // Usually this means showing the context (cues) before the user's line.
-            
-            val previousLines = if (currentLine != null) {
-                sortedLines.take(currentLineIndex)
-            } else {
-                emptyList()
-            }
+            val isUserLine = currentLine?.characterName?.equals(scene.readingFor, ignoreCase = true) ?: false
 
             SceneLineScreenUiState(
                 scene = scene,
                 lineList = sortedLines,
                 currSceneLine = currentLine ?: SceneLine(0, 0, 0, "", ""),
-                previousLines = previousLines,
+                previousLines = if (currentLine != null) sortedLines.take(currentLineIndex) else emptyList(),
                 currSceneLineNum = currNum,
                 totalSceneLines = sortedLines.size,
-                answerVisible = ansVisible
+                answerVisible = ansVisible,
+                isUserLine = isUserLine
             )
         }
             .stateIn(
@@ -81,18 +74,90 @@ class SceneViewModel(
                 )
             )
 
+    init {
+        viewModelScope.launch {
+            val scene = schmRepo.getScene(sceneId).filterNotNull().first()
+            val lines = schmRepo.getSceneLines(sceneId).first()
+            if (lines.isNotEmpty()) {
+                val sortedLines = lines.sortedBy { it.order }
+                val firstUserIndex = sortedLines.indexOfFirst {
+                    it.characterName.equals(scene.readingFor, ignoreCase = true)
+                }
+                if (firstUserIndex != -1) {
+                    currLineNum.value = firstUserIndex + 1
+                }
+            }
+        }
+    }
+
     fun prevSceneLine() {
-        val total = uiState.value.totalSceneLines
-        if (total == 0) return
-        currLineNum.value = if (currLineNum.value > 1) currLineNum.value - 1 else total
-        answerVisible.value = false
+        val state = uiState.value
+        val lines = state.lineList
+        val readingFor = state.scene.readingFor
+        if (lines.isEmpty()) return
+        
+        val currentIndex = state.currSceneLineNum - 1
+        
+        if (readingFor.isBlank()) {
+            currLineNum.value = if (currLineNum.value > 1) currLineNum.value - 1 else lines.size
+            answerVisible.value = false
+            return
+        }
+
+        var prevIndex = (currentIndex - 1 + lines.size) % lines.size
+        var found = false
+        val start = prevIndex
+        
+        do {
+            if (lines[prevIndex].characterName.equals(readingFor, ignoreCase = true)) {
+                found = true
+                break
+            }
+            prevIndex = (prevIndex - 1 + lines.size) % lines.size
+        } while (prevIndex != start)
+
+        if (found) {
+            currLineNum.value = prevIndex + 1
+            answerVisible.value = false
+        } else {
+            currLineNum.value = if (currLineNum.value > 1) currLineNum.value - 1 else lines.size
+            answerVisible.value = false
+        }
     }
 
     fun nextSceneLine() {
-        val total = uiState.value.totalSceneLines
-        if (total == 0) return
-        currLineNum.value = if (currLineNum.value < total) currLineNum.value + 1 else 1
-        answerVisible.value = false
+        val state = uiState.value
+        val lines = state.lineList
+        val readingFor = state.scene.readingFor
+        if (lines.isEmpty()) return
+        
+        val currentIndex = state.currSceneLineNum - 1
+        
+        if (readingFor.isBlank()) {
+            currLineNum.value = if (currLineNum.value < lines.size) currLineNum.value + 1 else 1
+            answerVisible.value = false
+            return
+        }
+        
+        var nextIndex = (currentIndex + 1) % lines.size
+        var found = false
+        val start = nextIndex
+        
+        do {
+            if (lines[nextIndex].characterName.equals(readingFor, ignoreCase = true)) {
+                found = true
+                break
+            }
+            nextIndex = (nextIndex + 1) % lines.size
+        } while (nextIndex != start)
+
+        if (found) {
+            currLineNum.value = nextIndex + 1
+            answerVisible.value = false
+        } else {
+            currLineNum.value = if (currLineNum.value < lines.size) currLineNum.value + 1 else 1
+            answerVisible.value = false
+        }
     }
 
     fun toggleAnswer() {
@@ -100,7 +165,7 @@ class SceneViewModel(
     }
 
     fun deleteSceneLine() {
-        // Implementation for deleting the current line if needed
+        // TODO: Complete this function
     }
 }
 
@@ -111,5 +176,6 @@ data class SceneLineScreenUiState(
     val previousLines: List<SceneLine> = emptyList(),
     val currSceneLineNum: Int = 1,
     val totalSceneLines: Int = 0,
-    val answerVisible: Boolean = false
+    val answerVisible: Boolean = false,
+    val isUserLine: Boolean = false
 )
