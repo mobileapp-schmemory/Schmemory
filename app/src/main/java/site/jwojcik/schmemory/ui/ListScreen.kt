@@ -24,6 +24,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -78,8 +79,11 @@ fun ListScreen(
     var showAddDialog by remember { mutableStateOf(false) }
     var showDeleteConfirmDialog by remember { mutableStateOf(false) }
     var newItemName by remember { mutableStateOf("") }
+    var importUrl by remember { mutableStateOf("") }
     var readingFor by remember { mutableStateOf("") }
     var addDialogMode by remember { mutableStateOf("create") } // "create" or "import"
+    var isImporting by remember { mutableStateOf(false) }
+    var importError by remember { mutableStateOf<String?>(null) }
 
     val fullList = if (listType == SchmemoryListType.SCENE) uiState.sceneList else uiState.speechList
     
@@ -130,6 +134,7 @@ fun ListScreen(
                     containerColor = Blue
                 ),
                 actions = {
+                    // Search button (toggle search, clear on deactivate)
                     IconButton(onClick = {
                         isSearchActive = !isSearchActive
                         if (!isSearchActive) {
@@ -138,9 +143,11 @@ fun ListScreen(
                     }) {
                         Icon(Icons.Filled.Search, contentDescription = "Search")
                     }
+                    // Add button
                     IconButton(onClick = { showAddDialog = true }) {
                         Icon(Icons.Filled.AddCircle, contentDescription = "Add")
                     }
+                    // Select button (with color change when active)
                     IconButton(onClick = {
                         isSelectionMode = !isSelectionMode
                         if (!isSelectionMode) {
@@ -153,6 +160,7 @@ fun ListScreen(
                             tint = if (isSelectionMode) Green else Color.Unspecified
                         )
                     }
+                    // Delete button (only show if items are selected)
                     if (selectedItems.isNotEmpty()) {
                         IconButton(onClick = { showDeleteConfirmDialog = true }) {
                             Icon(Icons.Filled.Delete, contentDescription = "Delete")
@@ -168,6 +176,7 @@ fun ListScreen(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
+            // Items list
             ItemList(
                 itemList = displayList,
                 listType = listType,
@@ -180,17 +189,23 @@ fun ListScreen(
         }
     }
 
+    // Add Item Dialog
     if (showAddDialog) {
         AlertDialog(
             onDismissRequest = {
-                showAddDialog = false
-                newItemName = ""
-                readingFor = ""
-                addDialogMode = "create"
+                if (!isImporting) {
+                    showAddDialog = false
+                    newItemName = ""
+                    importUrl = ""
+                    readingFor = ""
+                    addDialogMode = "create"
+                    importError = null
+                }
             },
             title = {
                 Column {
                     Text("Add New ${if (listType == SchmemoryListType.SPEECH) "Speech" else "Scene"}")
+                    // Mode selector buttons
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -200,6 +215,7 @@ fun ListScreen(
                         Button(
                             onClick = { addDialogMode = "create" },
                             modifier = Modifier.weight(1f),
+                            enabled = !isImporting,
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = if (addDialogMode == "create") Blue else Color.LightGray
                             )
@@ -209,6 +225,7 @@ fun ListScreen(
                         Button(
                             onClick = { addDialogMode = "import" },
                             modifier = Modifier.weight(1f),
+                            enabled = !isImporting,
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = if (addDialogMode == "import") Blue else Color.LightGray
                             )
@@ -249,7 +266,32 @@ fun ListScreen(
                     }
                     "import" -> {
                         Column {
-                            Text("Import functionality coming soon")
+                            Text("Paste a Pastebin Raw URL:")
+                            TextField(
+                                value = importUrl,
+                                onValueChange = { importUrl = it },
+                                placeholder = { Text("https://pastebin.com/raw/...") },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 8.dp),
+                                isError = importError != null,
+                                enabled = !isImporting
+                            )
+                            if (importError != null) {
+                                Text(
+                                    text = importError!!,
+                                    color = Color.Red,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.padding(top = 4.dp)
+                                )
+                            }
+                            if (isImporting) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterHorizontally)
+                                        .padding(top = 16.dp)
+                                )
+                            }
                         }
                     }
                 }
@@ -276,6 +318,31 @@ fun ListScreen(
                     ) {
                         Text("Create")
                     }
+                } else {
+                    Button(
+                        onClick = {
+                            if (importUrl.isNotBlank()) {
+                                isImporting = true
+                                importError = null
+                                viewModel.importFromPastebin(
+                                    url = importUrl,
+                                    listType = listType,
+                                    onSuccess = {
+                                        isImporting = false
+                                        showAddDialog = false
+                                        importUrl = ""
+                                    },
+                                    onError = { error ->
+                                        isImporting = false
+                                        importError = error
+                                    }
+                                )
+                            }
+                        },
+                        enabled = !isImporting
+                    ) {
+                        Text("Import")
+                    }
                 }
             },
             dismissButton = {
@@ -285,12 +352,23 @@ fun ListScreen(
                     readingFor = ""
                     addDialogMode = "create"
                 }) {
+                TextButton(
+                    onClick = {
+                        showAddDialog = false
+                        newItemName = ""
+                        importUrl = ""
+                        addDialogMode = "create"
+                        importError = null
+                    },
+                    enabled = !isImporting
+                ) {
                     Text("Cancel")
                 }
             }
         )
     }
 
+    // Delete Confirmation Dialog
     if (showDeleteConfirmDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirmDialog = false },
@@ -305,6 +383,7 @@ fun ListScreen(
                             SchmemoryListType.SCENE -> {
                                 viewModel.deleteSelectedScenes()
                             }
+
                             else -> {
                                 viewModel.deleteSelectedSpeeches()
                             }
@@ -394,12 +473,14 @@ fun ScriptCard(
                 .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Selection checkbox (only show in selection mode)
             if (isSelectionMode) {
                 Checkbox(
                     checked = isSelected,
                     onCheckedChange = { onSelectionChange(it) }
                 )
             } else {
+                // Play Button (Left-most)
                 IconButton(
                     onClick = { onItemClick(script.id) }
                 ) {
