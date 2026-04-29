@@ -50,7 +50,9 @@ import site.jwojcik.schmemory.data.AppPreferences
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    modifier: Modifier = Modifier.background(Yellow).fillMaxSize(),
+    modifier: Modifier = Modifier
+        .background(MaterialTheme.colorScheme.background)
+        .fillMaxSize(),
     onUpClick: () -> Unit = {}
 ) {
     val context = LocalContext.current

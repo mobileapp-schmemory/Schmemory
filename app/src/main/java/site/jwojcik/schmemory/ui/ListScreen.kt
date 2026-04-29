@@ -94,7 +94,7 @@ fun ListScreen(
     }
 
     Scaffold(
-        containerColor = Yellow,
+        containerColor = MaterialTheme.colorScheme.background,
         modifier = modifier,
         topBar = {
             TopAppBar(
@@ -450,7 +450,10 @@ fun ScriptCard(
                 }
             },
         colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) Green.copy(alpha = 0.3f) else Color.White
+            containerColor = if (isSelected)
+                Green.copy(alpha = 0.3f)
+            else
+                MaterialTheme.colorScheme.surfaceVariant
         )
     ) {
         Row(
@@ -468,7 +471,11 @@ fun ScriptCard(
                 IconButton(
                     onClick = { onItemClick(script.id) }
                 ) {
-                    Icon(Icons.Filled.PlayArrow, contentDescription = "Play")
+                    Icon(
+                        Icons.Filled.PlayArrow,
+                        contentDescription = "Play",
+                        tint = Color.Black
+                    )
                 }
             }
 
@@ -483,7 +490,11 @@ fun ScriptCard(
 
             if (!isSelectionMode) {
                 IconButton(onClick = { onEditClick(script.id) }) {
-                    Icon(Icons.Filled.Edit, contentDescription = "Edit")
+                    Icon(
+                        Icons.Filled.Edit,
+                        contentDescription = "Edit",
+                        tint = Color.Black
+                    )
                 }
             }
         }
