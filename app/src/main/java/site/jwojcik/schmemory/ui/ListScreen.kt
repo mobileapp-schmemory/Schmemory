@@ -32,8 +32,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -71,16 +71,7 @@ fun ListScreen(
         factory = ListScreenViewModel.Factory
     ),
 ) {
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
-
-    var scriptList by remember {
-        mutableStateOf<List<Script>>(
-            when (listType) {
-                SchmemoryListType.SCENE -> uiState.value.sceneList
-                else -> uiState.value.speechList
-            }
-        )
-    }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     var searchQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
@@ -91,13 +82,12 @@ fun ListScreen(
     var newItemName by remember { mutableStateOf("") }
     var addDialogMode by remember { mutableStateOf("create") } // "create" or "import"
 
+    val fullList = if (listType == SchmemoryListType.SCENE) uiState.sceneList else uiState.speechList
+    
     val displayList = if (searchQuery.isNotEmpty()) {
-        when (listType) {
-            SchmemoryListType.SCENE -> viewModel.searchScenes(searchQuery)
-            else -> viewModel.searchSpeeches(searchQuery)
-        }
+        fullList.filter { it.name.contains(searchQuery, ignoreCase = true) }
     } else {
-        scriptList
+        fullList
     }
 
     Scaffold(
@@ -124,7 +114,7 @@ fun ListScreen(
                         )
                     } else {
                         Text(
-                            text = if ("${listType.name}".equals("SPEECH")) "Speeches" else "Scenes"
+                            text = if (listType == SchmemoryListType.SPEECH) "Speeches" else "Scenes"
                         )
                     }
                 },
@@ -185,7 +175,7 @@ fun ListScreen(
         ) {
             // Items list
             ItemList(
-                itemList = scriptList,
+                itemList = displayList,
                 listType = listType,
                 onItemClick = onItemClick,
                 isSelectionMode = isSelectionMode,
@@ -264,11 +254,9 @@ fun ListScreen(
                                 when (listType) {
                                     SchmemoryListType.SCENE -> {
                                         viewModel.addScene(newItemName,"CHANGE")
-                                        scriptList = uiState.value.sceneList
                                     }
                                     else -> {
                                         viewModel.addSpeech(newItemName)
-                                        scriptList = uiState.value.speechList
                                     }
                                 }
                                 showAddDialog = false
@@ -307,12 +295,10 @@ fun ListScreen(
                         when (listType) {
                             SchmemoryListType.SCENE -> {
                                 viewModel.deleteSelectedScenes()
-                                scriptList = uiState.value.sceneList
                             }
 
                             else -> {
                                 viewModel.deleteSelectedSpeeches()
-                                scriptList = uiState.value.speechList
                             }
                         }
                         selectedItems.clear()
@@ -352,6 +338,11 @@ fun ItemList(
                 isSelectionMode = isSelectionMode,
                 isSelected = script.id in selectedItems,
                 onSelectionChange = { selected ->
+                    if (selected) {
+                        selectedItems.add(script.id)
+                    } else {
+                        selectedItems.remove(script.id)
+                    }
                     if (listType == SchmemoryListType.SCENE) viewModel.selectScene(script as Scene)
                     else viewModel.selectSpeech(script as Speech)
                 }
@@ -375,9 +366,11 @@ fun ScriptCard(
             .padding(8.dp)
             .fillMaxWidth()
             .border(width = 3.dp, color = if (isSelected) Green else Purple)
-            .clickable(enabled = isSelectionMode) {
+            .clickable {
                 if (isSelectionMode) {
                     onSelectionChange(!isSelected)
+                } else {
+                    onItemClick(script.id)
                 }
             },
         colors = CardDefaults.cardColors(
@@ -399,7 +392,7 @@ fun ScriptCard(
             } else {
                 // Play Button (Left-most)
                 IconButton(
-                    onClick = { /* TODO */ }
+                    onClick = { onItemClick(script.id) }
                 ) {
                     Icon(Icons.Filled.PlayArrow, contentDescription = "Play")
                 }
