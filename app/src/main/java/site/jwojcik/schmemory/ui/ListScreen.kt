@@ -44,12 +44,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import site.jwojcik.schmemory.R
 import site.jwojcik.schmemory.data.Scene
 import site.jwojcik.schmemory.data.Script
 import site.jwojcik.schmemory.data.Speech
@@ -81,6 +78,7 @@ fun ListScreen(
     var showAddDialog by remember { mutableStateOf(false) }
     var showDeleteConfirmDialog by remember { mutableStateOf(false) }
     var newItemName by remember { mutableStateOf("") }
+    var readingFor by remember { mutableStateOf("") }
     var addDialogMode by remember { mutableStateOf("create") } // "create" or "import"
 
     val fullList = if (listType == SchmemoryListType.SCENE) uiState.sceneList else uiState.speechList
@@ -132,7 +130,6 @@ fun ListScreen(
                     containerColor = Blue
                 ),
                 actions = {
-                    // Search button (toggle search, clear on deactivate)
                     IconButton(onClick = {
                         isSearchActive = !isSearchActive
                         if (!isSearchActive) {
@@ -141,11 +138,9 @@ fun ListScreen(
                     }) {
                         Icon(Icons.Filled.Search, contentDescription = "Search")
                     }
-                    // Add button
                     IconButton(onClick = { showAddDialog = true }) {
                         Icon(Icons.Filled.AddCircle, contentDescription = "Add")
                     }
-                    // Select button (with color change when active)
                     IconButton(onClick = {
                         isSelectionMode = !isSelectionMode
                         if (!isSelectionMode) {
@@ -158,7 +153,6 @@ fun ListScreen(
                             tint = if (isSelectionMode) Green else Color.Unspecified
                         )
                     }
-                    // Delete button (only show if items are selected)
                     if (selectedItems.isNotEmpty()) {
                         IconButton(onClick = { showDeleteConfirmDialog = true }) {
                             Icon(Icons.Filled.Delete, contentDescription = "Delete")
@@ -174,7 +168,6 @@ fun ListScreen(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            // Items list
             ItemList(
                 itemList = displayList,
                 listType = listType,
@@ -187,18 +180,17 @@ fun ListScreen(
         }
     }
 
-    // Add Item Dialog
     if (showAddDialog) {
         AlertDialog(
             onDismissRequest = {
                 showAddDialog = false
                 newItemName = ""
+                readingFor = ""
                 addDialogMode = "create"
             },
             title = {
                 Column {
                     Text("Add New ${if (listType == SchmemoryListType.SPEECH) "Speech" else "Scene"}")
-                    // Mode selector buttons
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -239,6 +231,20 @@ fun ListScreen(
                                     .fillMaxWidth()
                                     .padding(top = 8.dp)
                             )
+                            if (listType == SchmemoryListType.SCENE) {
+                                Text(
+                                    text = "Character you're reading for:",
+                                    modifier = Modifier.padding(top = 16.dp)
+                                )
+                                TextField(
+                                    value = readingFor,
+                                    onValueChange = { readingFor = it },
+                                    placeholder = { Text("Character name") },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 8.dp)
+                                )
+                            }
                         }
                     }
                     "import" -> {
@@ -255,7 +261,7 @@ fun ListScreen(
                             if (newItemName.isNotBlank()) {
                                 when (listType) {
                                     SchmemoryListType.SCENE -> {
-                                        viewModel.addScene(newItemName,"CHANGE")
+                                        viewModel.addScene(newItemName, readingFor)
                                     }
                                     else -> {
                                         viewModel.addSpeech(newItemName)
@@ -263,6 +269,7 @@ fun ListScreen(
                                 }
                                 showAddDialog = false
                                 newItemName = ""
+                                readingFor = ""
                                 addDialogMode = "create"
                             }
                         }
@@ -275,6 +282,7 @@ fun ListScreen(
                 TextButton(onClick = {
                     showAddDialog = false
                     newItemName = ""
+                    readingFor = ""
                     addDialogMode = "create"
                 }) {
                     Text("Cancel")
@@ -283,7 +291,6 @@ fun ListScreen(
         )
     }
 
-    // Delete Confirmation Dialog
     if (showDeleteConfirmDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirmDialog = false },
@@ -298,7 +305,6 @@ fun ListScreen(
                             SchmemoryListType.SCENE -> {
                                 viewModel.deleteSelectedScenes()
                             }
-
                             else -> {
                                 viewModel.deleteSelectedSpeeches()
                             }
@@ -388,14 +394,12 @@ fun ScriptCard(
                 .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Selection checkbox (only show in selection mode)
             if (isSelectionMode) {
                 Checkbox(
                     checked = isSelected,
                     onCheckedChange = { onSelectionChange(it) }
                 )
             } else {
-                // Play Button (Left-most)
                 IconButton(
                     onClick = { onItemClick(script.id) }
                 ) {
@@ -403,17 +407,15 @@ fun ScriptCard(
                 }
             }
 
-            // Text immediately after the button
             Text(
                 text = if (script.name.length > 24) "${script.name.take(24)}..." else script.name,
                 color = Color.Black,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier
-                    .weight(1f) // This "pushes" the remaining icons to the far right
-                    .padding(start = 4.dp) // Add a tiny bit of space from the play button
+                    .weight(1f)
+                    .padding(start = 4.dp)
             )
 
-            // Edit and Info Buttons (Right-most, only show when not in selection mode)
             if (!isSelectionMode) {
                 IconButton(onClick = { onEditClick(script.id) }) {
                     Icon(Icons.Filled.Edit, contentDescription = "Edit")
@@ -421,15 +423,4 @@ fun ScriptCard(
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun ListPreview() {
-    ListScreen(
-        listType = SchmemoryListType.SPEECH,
-        onUpClick = { true },
-        onItemClick = { },
-        onEditClick = { }
-    )
 }
