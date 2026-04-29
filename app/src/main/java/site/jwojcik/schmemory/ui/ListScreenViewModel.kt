@@ -58,6 +58,7 @@ class ListScreenViewModel(private val schmRepo: SchmemoryRepository) : ViewModel
 
     fun addScene(name: String, readingFor: String) {
         schmRepo.addScene(Scene(name = name,readingFor=readingFor))
+
     }
 
     fun selectScene(scene: Scene) {
