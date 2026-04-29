@@ -9,6 +9,9 @@ interface SceneDao {
     @Query("SELECT * FROM Scene WHERE id = :id")
     fun getScene(id: Long): Flow<Scene?>
 
+    @Query("SELECT * FROM Scene ORDER BY id")
+    fun getScenes(): Flow<List<Scene>>
+
     @Query("SELECT * FROM Scene WHERE name LIKE :name ORDER BY id")
     fun sceneSearch(name: String): Flow<List<Scene>>
 

@@ -47,8 +47,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import site.jwojcik.schmemory.R
+import site.jwojcik.schmemory.data.Scene
 import site.jwojcik.schmemory.data.Script
+import site.jwojcik.schmemory.data.Speech
 import site.jwojcik.schmemory.ui.theme.Blue
 import site.jwojcik.schmemory.ui.theme.Green
 import site.jwojcik.schmemory.ui.theme.Purple
@@ -62,16 +66,18 @@ fun ListScreen(
     listType: SchmemoryListType,
     onUpClick: () -> Boolean,
     onItemClick: (Long) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: ListScreenViewModel = viewModel(
+        factory = ListScreenViewModel.Factory
+    ),
 ) {
-    val sceneDataSource = remember { SceneDataSource() }
-    val speechDataSource = remember { SpeechDataSource() }
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
     var scriptList by remember {
         mutableStateOf<List<Script>>(
             when (listType) {
-                SchmemoryListType.SCENE -> sceneDataSource.loadScenes()
-                else -> speechDataSource.loadSpeeches()
+                SchmemoryListType.SCENE -> uiState.value.sceneList
+                else -> uiState.value.speechList
             }
         )
     }
@@ -87,8 +93,8 @@ fun ListScreen(
 
     val displayList = if (searchQuery.isNotEmpty()) {
         when (listType) {
-            SchmemoryListType.SCENE -> sceneDataSource.searchScenes(searchQuery)
-            else -> speechDataSource.searchSpeeches(searchQuery)
+            SchmemoryListType.SCENE -> viewModel.searchScenes(searchQuery)
+            else -> viewModel.searchSpeeches(searchQuery)
         }
     } else {
         scriptList
@@ -179,10 +185,12 @@ fun ListScreen(
         ) {
             // Items list
             ItemList(
-                itemList = displayList,
+                itemList = scriptList,
+                listType = listType,
                 onItemClick = onItemClick,
                 isSelectionMode = isSelectionMode,
-                selectedItems = selectedItems
+                selectedItems = selectedItems,
+                viewModel = viewModel
             )
         }
     }
@@ -255,12 +263,12 @@ fun ListScreen(
                             if (newItemName.isNotBlank()) {
                                 when (listType) {
                                     SchmemoryListType.SCENE -> {
-                                        sceneDataSource.addScene(newItemName)
-                                        scriptList = sceneDataSource.loadScenes()
+                                        viewModel.addScene(newItemName,"CHANGE")
+                                        scriptList = uiState.value.sceneList
                                     }
                                     else -> {
-                                        speechDataSource.addSpeech(newItemName)
-                                        scriptList = speechDataSource.loadSpeeches()
+                                        viewModel.addSpeech(newItemName)
+                                        scriptList = uiState.value.speechList
                                     }
                                 }
                                 showAddDialog = false
@@ -298,13 +306,13 @@ fun ListScreen(
                     onClick = {
                         when (listType) {
                             SchmemoryListType.SCENE -> {
-                                //sceneDataSource.deleteSceneList(selectedItems.toList())
-                                scriptList = sceneDataSource.loadScenes()
+                                viewModel.deleteSelectedScenes()
+                                scriptList = uiState.value.sceneList
                             }
 
                             else -> {
-                                //speechDataSource.deleteSpeechList(selectedItems.toList())
-                                scriptList = speechDataSource.loadSpeeches()
+                                viewModel.deleteSelectedSpeeches()
+                                scriptList = uiState.value.speechList
                             }
                         }
                         selectedItems.clear()
@@ -327,9 +335,11 @@ fun ListScreen(
 @Composable
 fun ItemList(
     itemList: List<Script>,
+    listType: SchmemoryListType,
     onItemClick: (Long) -> Unit,
     isSelectionMode: Boolean = false,
-    selectedItems: MutableList<Long> = mutableListOf()
+    selectedItems: MutableList<Long> = mutableListOf(),
+    viewModel: ListScreenViewModel
 ) {
     LazyColumn {
         items(
@@ -342,11 +352,8 @@ fun ItemList(
                 isSelectionMode = isSelectionMode,
                 isSelected = script.id in selectedItems,
                 onSelectionChange = { selected ->
-                    if (selected) {
-                        selectedItems.add(script.id)
-                    } else {
-                        selectedItems.remove(script.id)
-                    }
+                    if (listType == SchmemoryListType.SCENE) viewModel.selectScene(script as Scene)
+                    else viewModel.selectSpeech(script as Speech)
                 }
             )
         }

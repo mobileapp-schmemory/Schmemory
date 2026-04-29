@@ -1,4 +1,4 @@
-package com.zybooks.studyhelper.ui.sceneLine
+package site.jwojcik.schmemory.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import site.jwojcik.schmemory.data.SceneLine
-import site.jwojcik.schmemory.ui.SceneViewModel
 
 @Composable
 fun SceneScreen(

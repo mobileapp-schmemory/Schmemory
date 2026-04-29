@@ -6,7 +6,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.zybooks.studyhelper.ui.sceneLine.SceneScreen
 import kotlinx.serialization.Serializable
 import site.jwojcik.schmemory.data.SchmemoryRepository
 import site.jwojcik.schmemory.ui.HomeScreen
@@ -14,6 +13,7 @@ import site.jwojcik.schmemory.ui.ListScreen
 import site.jwojcik.schmemory.ui.SchmemoryListType
 import site.jwojcik.schmemory.ui.SettingsScreen
 import site.jwojcik.schmemory.ui.SpeechScreen
+import site.jwojcik.schmemory.ui.SceneScreen
 
 sealed class Routes {
     @Serializable
@@ -90,7 +90,6 @@ fun SchmemoryApp() {
             val speech: Routes.Speech = backstackEntry.toRoute()
 
             SpeechScreen(
-                speechId = speech.speechId,
                 onUpClick = {
                     navController.navigateUp()
                 }
@@ -114,7 +113,6 @@ fun SchmemoryApp() {
             val scene: Routes.Scene = backstackEntry.toRoute()
 
             SceneScreen(
-                sceneId = scene.sceneId,
                 onUpClick = {
                     navController.navigateUp()
                 }

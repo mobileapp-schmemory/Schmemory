@@ -35,6 +35,8 @@ class SchmemoryRepository(context: Context) {
 
     fun getScene(sceneId: Long) = sceneDao.getScene(sceneId)
 
+    fun getScenes() = sceneDao.getScenes()
+
     fun sceneSearch(name: String) = sceneDao.sceneSearch(name)
 
     fun addScene(scene: Scene) {
@@ -58,6 +60,8 @@ class SchmemoryRepository(context: Context) {
     }
 
     fun getSpeech(speechId: Long) = speechDao.getSpeech(speechId)
+
+    fun getSpeeches() = speechDao.getSpeeches()
 
     fun speechSearch(name: String) = speechDao.speechSearch(name)
 
