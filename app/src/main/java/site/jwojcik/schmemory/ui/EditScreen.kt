@@ -20,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -39,7 +40,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import site.jwojcik.schmemory.data.SceneLine
 import site.jwojcik.schmemory.ui.theme.Blue
-import site.jwojcik.schmemory.ui.theme.Yellow
+import site.jwojcik.schmemory.ui.theme.Black
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -88,7 +89,7 @@ fun EditScreen(
     }
 
     Scaffold(
-        containerColor = Yellow,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {
@@ -97,27 +98,50 @@ fun EditScreen(
                             value = it.name,
                             onValueChange = { newName -> viewModel.updateScriptName(newName) },
                             modifier = Modifier.fillMaxWidth().padding(end = 8.dp),
-                            textStyle = MaterialTheme.typography.titleLarge,
-                            singleLine = true
+                            textStyle = MaterialTheme.typography.titleLarge.copy(color = Black),
+                            singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = Black,
+                                unfocusedTextColor = Black,
+                                focusedBorderColor = Black,
+                                unfocusedBorderColor = Black.copy(alpha = 0.5f),
+                                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            )
                         )
                     }
                 },
                 navigationIcon = {
                     IconButton(onClick = handleBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack, 
+                            contentDescription = "Back",
+                            tint = Black
+                        )
                     }
                 },
                 actions = {
                     IconButton(onClick = { 
                         viewModel.save(onSuccess = onUpClick)
                     }) {
-                        Icon(Icons.Default.Check, contentDescription = "Save")
+                        Icon(
+                            Icons.Default.Check, 
+                            contentDescription = "Save",
+                            tint = Black
+                        )
                     }
                     IconButton(onClick = { viewModel.addLine() }) {
-                        Icon(Icons.Default.Add, contentDescription = "Add Line")
+                        Icon(
+                            Icons.Default.Add, 
+                            contentDescription = "Add Line",
+                            tint = Black
+                        )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Blue)
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Blue,
+                    titleContentColor = Black
+                )
             )
         }
     ) { innerPadding ->
@@ -137,19 +161,42 @@ fun EditScreen(
                                 label = { Text("Character") },
                                 modifier = Modifier.weight(0.3f).padding(end = 8.dp),
                                 singleLine = true,
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedTextColor = Black,
+                                    unfocusedTextColor = Black,
+                                    focusedBorderColor = Blue,
+                                    focusedLabelColor = Black,
+                                    unfocusedLabelColor = Black.copy(alpha = 0.6f),
+                                    cursorColor = Blue,
+                                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                )
                             )
                         }
                         OutlinedTextField(
                             value = line.text,
                             onValueChange = { viewModel.updateLineText(line, it) },
                             label = { Text("Line Text") },
-                            modifier = Modifier.weight(0.7f)
+                            modifier = Modifier.weight(0.7f),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = Black,
+                                unfocusedTextColor = Black,
+                                focusedBorderColor = Blue,
+                                focusedLabelColor = Black,
+                                unfocusedLabelColor = Black.copy(alpha = 0.6f),
+                                cursorColor = Blue,
+                                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            )
                         )
                         IconButton(onClick = { viewModel.deleteLine(line) }) {
                             Icon(Icons.Default.Delete, contentDescription = "Delete Line", tint = Color.Red)
                         }
                     }
-                    HorizontalDivider(modifier = Modifier.padding(top = 16.dp))
+                    HorizontalDivider(
+                        modifier = Modifier.padding(top = 16.dp),
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.12f)
+                    )
                 }
             }
         }
