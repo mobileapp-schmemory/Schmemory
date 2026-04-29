@@ -66,6 +66,7 @@ fun ListScreen(
     listType: SchmemoryListType,
     onUpClick: () -> Boolean,
     onItemClick: (Long) -> Unit,
+    onEditClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ListScreenViewModel = viewModel(
         factory = ListScreenViewModel.Factory
@@ -178,6 +179,7 @@ fun ListScreen(
                 itemList = displayList,
                 listType = listType,
                 onItemClick = onItemClick,
+                onEditClick = onEditClick,
                 isSelectionMode = isSelectionMode,
                 selectedItems = selectedItems,
                 viewModel = viewModel
@@ -323,6 +325,7 @@ fun ItemList(
     itemList: List<Script>,
     listType: SchmemoryListType,
     onItemClick: (Long) -> Unit,
+    onEditClick: (Long) -> Unit,
     isSelectionMode: Boolean = false,
     selectedItems: MutableList<Long> = mutableListOf(),
     viewModel: ListScreenViewModel
@@ -335,6 +338,7 @@ fun ItemList(
             ScriptCard(
                 script = script,
                 onItemClick = onItemClick,
+                onEditClick = onEditClick,
                 isSelectionMode = isSelectionMode,
                 isSelected = script.id in selectedItems,
                 onSelectionChange = { selected ->
@@ -356,6 +360,7 @@ fun ItemList(
 fun ScriptCard(
     script: Script,
     onItemClick: (Long) -> Unit,
+    onEditClick: (Long) -> Unit,
     isSelectionMode: Boolean = false,
     isSelected: Boolean = false,
     onSelectionChange: (Boolean) -> Unit = {},
@@ -410,7 +415,7 @@ fun ScriptCard(
 
             // Edit and Info Buttons (Right-most, only show when not in selection mode)
             if (!isSelectionMode) {
-                IconButton(onClick = { /* TODO */ }) {
+                IconButton(onClick = { onEditClick(script.id) }) {
                     Icon(Icons.Filled.Edit, contentDescription = "Edit")
                 }
                 IconButton(onClick = { /* TODO */ }) {
@@ -431,6 +436,7 @@ fun ListPreview() {
     ListScreen(
         listType = SchmemoryListType.SPEECH,
         onUpClick = { true },
-        onItemClick = { }
+        onItemClick = { },
+        onEditClick = { }
     )
 }

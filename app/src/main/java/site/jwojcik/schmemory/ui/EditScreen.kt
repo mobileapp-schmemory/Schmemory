@@ -1,0 +1,114 @@
+package site.jwojcik.schmemory.ui
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import site.jwojcik.schmemory.data.SceneLine
+import site.jwojcik.schmemory.ui.theme.Blue
+import site.jwojcik.schmemory.ui.theme.Yellow
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditScreen(
+    scriptId: Long,
+    listType: SchmemoryListType,
+    onUpClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: EditViewModel = viewModel(factory = EditViewModel.Factory)
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(scriptId, listType) {
+        viewModel.setScript(scriptId, listType)
+    }
+
+    Scaffold(
+        containerColor = Yellow,
+        topBar = {
+            TopAppBar(
+                title = {
+                    uiState.script?.let {
+                        OutlinedTextField(
+                            value = it.name,
+                            onValueChange = { newName -> viewModel.updateScriptName(newName) },
+                            modifier = Modifier.fillMaxWidth().padding(end = 8.dp),
+                            textStyle = MaterialTheme.typography.titleLarge,
+                            singleLine = true
+                        )
+                    }
+                },
+                navigationIcon = {
+                    IconButton(onClick = onUpClick) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { viewModel.addLine() }) {
+                        Icon(Icons.Default.Add, contentDescription = "Add Line")
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Blue)
+            )
+        }
+    ) { innerPadding ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(16.dp)
+        ) {
+            items(uiState.lines) { line ->
+                Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (line is SceneLine) {
+                            OutlinedTextField(
+                                value = line.characterName,
+                                onValueChange = { viewModel.updateCharacterName(line, it) },
+                                label = { Text("Character") },
+                                modifier = Modifier.weight(0.3f).padding(end = 8.dp),
+                                singleLine = true
+                            )
+                        }
+                        OutlinedTextField(
+                            value = line.text,
+                            onValueChange = { viewModel.updateLineText(line, it) },
+                            label = { Text("Line Text") },
+                            modifier = Modifier.weight(0.7f)
+                        )
+                        IconButton(onClick = { viewModel.deleteLine(line) }) {
+                            Icon(Icons.Default.Delete, contentDescription = "Delete Line", tint = Color.Red)
+                        }
+                    }
+                    HorizontalDivider(modifier = Modifier.padding(top = 16.dp))
+                }
+            }
+        }
+    }
+}

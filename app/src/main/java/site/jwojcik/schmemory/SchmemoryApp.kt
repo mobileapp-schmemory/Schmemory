@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import site.jwojcik.schmemory.data.SchmemoryRepository
+import site.jwojcik.schmemory.ui.EditScreen
 import site.jwojcik.schmemory.ui.HomeScreen
 import site.jwojcik.schmemory.ui.ListScreen
 import site.jwojcik.schmemory.ui.SchmemoryListType
@@ -28,10 +29,20 @@ sealed class Routes {
     )
 
     @Serializable
+    data class EditSpeech(
+        val speechId: Long
+    )
+
+    @Serializable
     data object SceneList
 
     @Serializable
     data class Scene(
+        val sceneId: Long
+    )
+
+    @Serializable
+    data class EditScene(
         val sceneId: Long
     )
 
@@ -83,6 +94,11 @@ fun SchmemoryApp() {
                     navController.navigate(
                         Routes.Speech(speechId)
                     )
+                },
+                onEditClick = { speechId: Long ->
+                    navController.navigate(
+                        Routes.EditSpeech(speechId)
+                    )
                 }
             )
         }
@@ -93,6 +109,14 @@ fun SchmemoryApp() {
                 onUpClick = {
                     navController.navigateUp()
                 }
+            )
+        }
+        composable<Routes.EditSpeech> { backstackEntry ->
+            val editSpeech: Routes.EditSpeech = backstackEntry.toRoute()
+            EditScreen(
+                scriptId = editSpeech.speechId,
+                listType = SchmemoryListType.SPEECH,
+                onUpClick = { navController.navigateUp() }
             )
         }
 
@@ -106,6 +130,11 @@ fun SchmemoryApp() {
                     navController.navigate(
                         Routes.Scene(sceneId)
                     )
+                },
+                onEditClick = { sceneId: Long ->
+                    navController.navigate(
+                        Routes.EditScene(sceneId)
+                    )
                 }
             )
         }
@@ -116,6 +145,14 @@ fun SchmemoryApp() {
                 onUpClick = {
                     navController.navigateUp()
                 }
+            )
+        }
+        composable<Routes.EditScene> { backstackEntry ->
+            val editScene: Routes.EditScene = backstackEntry.toRoute()
+            EditScreen(
+                scriptId = editScene.sceneId,
+                listType = SchmemoryListType.SCENE,
+                onUpClick = { navController.navigateUp() }
             )
         }
     }
