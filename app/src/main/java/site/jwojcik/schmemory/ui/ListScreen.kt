@@ -24,6 +24,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -81,7 +82,10 @@ fun ListScreen(
     var showAddDialog by remember { mutableStateOf(false) }
     var showDeleteConfirmDialog by remember { mutableStateOf(false) }
     var newItemName by remember { mutableStateOf("") }
+    var importUrl by remember { mutableStateOf("") }
     var addDialogMode by remember { mutableStateOf("create") } // "create" or "import"
+    var isImporting by remember { mutableStateOf(false) }
+    var importError by remember { mutableStateOf<String?>(null) }
 
     val fullList = if (listType == SchmemoryListType.SCENE) uiState.sceneList else uiState.speechList
     
@@ -191,9 +195,13 @@ fun ListScreen(
     if (showAddDialog) {
         AlertDialog(
             onDismissRequest = {
-                showAddDialog = false
-                newItemName = ""
-                addDialogMode = "create"
+                if (!isImporting) {
+                    showAddDialog = false
+                    newItemName = ""
+                    importUrl = ""
+                    addDialogMode = "create"
+                    importError = null
+                }
             },
             title = {
                 Column {
@@ -208,6 +216,7 @@ fun ListScreen(
                         Button(
                             onClick = { addDialogMode = "create" },
                             modifier = Modifier.weight(1f),
+                            enabled = !isImporting,
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = if (addDialogMode == "create") Blue else Color.LightGray
                             )
@@ -217,6 +226,7 @@ fun ListScreen(
                         Button(
                             onClick = { addDialogMode = "import" },
                             modifier = Modifier.weight(1f),
+                            enabled = !isImporting,
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = if (addDialogMode == "import") Blue else Color.LightGray
                             )
@@ -243,7 +253,32 @@ fun ListScreen(
                     }
                     "import" -> {
                         Column {
-                            Text("Import functionality coming soon")
+                            Text("Paste a Pastebin Raw URL:")
+                            TextField(
+                                value = importUrl,
+                                onValueChange = { importUrl = it },
+                                placeholder = { Text("https://pastebin.com/raw/...") },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 8.dp),
+                                isError = importError != null,
+                                enabled = !isImporting
+                            )
+                            if (importError != null) {
+                                Text(
+                                    text = importError!!,
+                                    color = Color.Red,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.padding(top = 4.dp)
+                                )
+                            }
+                            if (isImporting) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterHorizontally)
+                                        .padding(top = 16.dp)
+                                )
+                            }
                         }
                     }
                 }
@@ -269,14 +304,44 @@ fun ListScreen(
                     ) {
                         Text("Create")
                     }
+                } else {
+                    Button(
+                        onClick = {
+                            if (importUrl.isNotBlank()) {
+                                isImporting = true
+                                importError = null
+                                viewModel.importFromPastebin(
+                                    url = importUrl,
+                                    listType = listType,
+                                    onSuccess = {
+                                        isImporting = false
+                                        showAddDialog = false
+                                        importUrl = ""
+                                    },
+                                    onError = { error ->
+                                        isImporting = false
+                                        importError = error
+                                    }
+                                )
+                            }
+                        },
+                        enabled = !isImporting
+                    ) {
+                        Text("Import")
+                    }
                 }
             },
             dismissButton = {
-                TextButton(onClick = {
-                    showAddDialog = false
-                    newItemName = ""
-                    addDialogMode = "create"
-                }) {
+                TextButton(
+                    onClick = {
+                        showAddDialog = false
+                        newItemName = ""
+                        importUrl = ""
+                        addDialogMode = "create"
+                        importError = null
+                    },
+                    enabled = !isImporting
+                ) {
                     Text("Cancel")
                 }
             }

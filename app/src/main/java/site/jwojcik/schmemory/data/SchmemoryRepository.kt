@@ -7,6 +7,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SchmemoryRepository(context: Context) {
 
@@ -39,22 +40,24 @@ class SchmemoryRepository(context: Context) {
 
     fun sceneSearch(name: String) = sceneDao.sceneSearch(name)
 
-    fun addScene(scene: Scene) {
-        if (scene.name.trim() != "") {
-            CoroutineScope(Dispatchers.IO).launch {
-                scene.id = sceneDao.addScene(scene)
-            }
+    suspend fun addScene(scene: Scene): Long {
+        return withContext(Dispatchers.IO) {
+            if (scene.name.trim() != "") {
+                val id = sceneDao.addScene(scene)
+                scene.id = id
+                id
+            } else 0L
         }
     }
 
-    fun updateScene(scene: Scene) {
-        CoroutineScope(Dispatchers.IO).launch {
+    suspend fun updateScene(scene: Scene) {
+        withContext(Dispatchers.IO) {
             sceneDao.updateScene(scene)
         }
     }
 
-    fun deleteScene(scene: Scene) {
-        CoroutineScope(Dispatchers.IO).launch {
+    suspend fun deleteScene(scene: Scene) {
+        withContext(Dispatchers.IO) {
             sceneDao.deleteScene(scene)
         }
     }
@@ -65,22 +68,24 @@ class SchmemoryRepository(context: Context) {
 
     fun speechSearch(name: String) = speechDao.speechSearch(name)
 
-    fun addSpeech(speech: Speech) {
-        if (speech.name.trim() != "") {
-            CoroutineScope(Dispatchers.IO).launch {
-                speech.id = speechDao.addSpeech(speech)
-            }
+    suspend fun addSpeech(speech: Speech): Long {
+        return withContext(Dispatchers.IO) {
+            if (speech.name.trim() != "") {
+                val id = speechDao.addSpeech(speech)
+                speech.id = id
+                id
+            } else 0L
         }
     }
 
-    fun updateSpeech(speech: Speech) {
-        CoroutineScope(Dispatchers.IO).launch {
+    suspend fun updateSpeech(speech: Speech) {
+        withContext(Dispatchers.IO) {
             speechDao.updateSpeech(speech)
         }
     }
 
-    fun deleteSpeech(speech: Speech) {
-        CoroutineScope(Dispatchers.IO).launch {
+    suspend fun deleteSpeech(speech: Speech) {
+        withContext(Dispatchers.IO) {
             speechDao.deleteSpeech(speech)
         }
     }
@@ -89,20 +94,22 @@ class SchmemoryRepository(context: Context) {
 
     fun getSpeechLines(speechId: Long) = speechLineDao.getSpeechLines(speechId)
 
-    fun addSpeechLine(speechLine: SpeechLine) {
-        CoroutineScope(Dispatchers.IO).launch {
-            speechLine.id = speechLineDao.addSpeechLine(speechLine)
+    suspend fun addSpeechLine(speechLine: SpeechLine): Long {
+        return withContext(Dispatchers.IO) {
+            val id = speechLineDao.addSpeechLine(speechLine)
+            speechLine.id = id
+            id
         }
     }
 
-    fun updateSpeechLine(speechLine: SpeechLine) {
-        CoroutineScope(Dispatchers.IO).launch {
+    suspend fun updateSpeechLine(speechLine: SpeechLine) {
+        withContext(Dispatchers.IO) {
             speechLineDao.updateSpeechLine(speechLine)
         }
     }
 
-    fun deleteSpeechLine(speechLine: SpeechLine) {
-        CoroutineScope(Dispatchers.IO).launch {
+    suspend fun deleteSpeechLine(speechLine: SpeechLine) {
+        withContext(Dispatchers.IO) {
             speechLineDao.deleteSpeechLine(speechLine)
         }
     }
@@ -111,26 +118,28 @@ class SchmemoryRepository(context: Context) {
 
     fun getSceneLines(sceneId: Long) = sceneLineDao.getSceneLines(sceneId)
 
-    fun addSceneLine(sceneLine: SceneLine) {
-        CoroutineScope(Dispatchers.IO).launch {
-            sceneLine.id = sceneLineDao.addSceneLine(sceneLine)
+    suspend fun addSceneLine(sceneLine: SceneLine): Long {
+        return withContext(Dispatchers.IO) {
+            val id = sceneLineDao.addSceneLine(sceneLine)
+            sceneLine.id = id
+            id
         }
     }
 
-    fun updateSceneLine(sceneLine: SceneLine) {
-        CoroutineScope(Dispatchers.IO).launch {
+    suspend fun updateSceneLine(sceneLine: SceneLine) {
+        withContext(Dispatchers.IO) {
             sceneLineDao.updateSceneLine(sceneLine)
         }
     }
 
-    fun deleteSceneLine(sceneLine: SceneLine) {
-        CoroutineScope(Dispatchers.IO).launch {
+    suspend fun deleteSceneLine(sceneLine: SceneLine) {
+        withContext(Dispatchers.IO) {
             sceneLineDao.deleteSceneLine(sceneLine)
         }
     }
 
 
-    private fun addStarterData() {
+    private suspend fun addStarterData() {
         val windowSceneId = sceneDao.addScene(
             Scene(
                 name = "Window Scene (Excerpt)",
@@ -353,4 +362,3 @@ class SchmemoryRepository(context: Context) {
         )
     }
 }
-
