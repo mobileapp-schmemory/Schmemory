@@ -418,13 +418,6 @@ fun ScriptCard(
                 IconButton(onClick = { onEditClick(script.id) }) {
                     Icon(Icons.Filled.Edit, contentDescription = "Edit")
                 }
-                IconButton(onClick = { /* TODO */ }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.anya),
-                        contentDescription = "View Placeholder",
-                        tint = Color.Unspecified
-                    )
-                }
             }
         }
     }

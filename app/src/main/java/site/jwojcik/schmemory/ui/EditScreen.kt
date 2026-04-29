@@ -93,7 +93,7 @@ fun EditScreen(
                                 onValueChange = { viewModel.updateCharacterName(line, it) },
                                 label = { Text("Character") },
                                 modifier = Modifier.weight(0.3f).padding(end = 8.dp),
-                                singleLine = true
+                                singleLine = true,
                             )
                         }
                         OutlinedTextField(
