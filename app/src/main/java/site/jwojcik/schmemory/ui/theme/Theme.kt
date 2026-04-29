@@ -11,15 +11,23 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = Blue,
+    secondary = Green,
+    background = Gray,
+    surface = Gray,
+    onPrimary = White,
+    onBackground = White,
+    surfaceVariant = Yellow
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = Blue,
+    secondary = Green,
+    background = Yellow,
+    surface = Yellow,
+    onPrimary = Black,
+    onBackground = Black,
+    surfaceVariant = White
 )
 
 @Composable
@@ -28,7 +36,7 @@ fun SchmemoryTheme(
     fontScale: Float,
     dyslexicFont: Boolean,
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -41,15 +49,15 @@ fun SchmemoryTheme(
         else -> LightColorScheme
     }
 
-    val dyslexicFamily = if (dyslexicFont) {
-        FontFamily.Default
+    val currentTypography = if (dyslexicFont) {
+        getTypography(FontFamily.Default)
     } else {
-         Typography.bodyLarge.fontFamily
+        Typography
     }
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = currentTypography,
         content = content
     )
 }
