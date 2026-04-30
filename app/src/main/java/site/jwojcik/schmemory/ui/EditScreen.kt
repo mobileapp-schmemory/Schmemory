@@ -1,6 +1,7 @@
 package site.jwojcik.schmemory.ui
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -158,8 +159,15 @@ fun EditScreen(
                             OutlinedTextField(
                                 value = line.characterName,
                                 onValueChange = { viewModel.updateCharacterName(line, it) },
-                                label = { Text("Character") },
-                                modifier = Modifier.weight(0.3f).padding(end = 8.dp),
+                                label = { 
+                                    Text(
+                                        "Character",
+                                        modifier = Modifier
+                                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                                            .padding(horizontal = 4.dp)
+                                    ) 
+                                },
+                                modifier = Modifier.weight(0.42f).padding(end = 8.dp),
                                 singleLine = true,
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedTextColor = Black,
@@ -176,8 +184,15 @@ fun EditScreen(
                         OutlinedTextField(
                             value = line.text,
                             onValueChange = { viewModel.updateLineText(line, it) },
-                            label = { Text("Line Text") },
-                            modifier = Modifier.weight(0.7f),
+                            label = { 
+                                Text(
+                                    "Line Text",
+                                    modifier = Modifier
+                                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                                        .padding(horizontal = 4.dp)
+                                ) 
+                            },
+                            modifier = Modifier.weight(0.58f),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = Black,
                                 unfocusedTextColor = Black,
