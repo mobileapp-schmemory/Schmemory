@@ -76,6 +76,8 @@ fun SettingsScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Blue,
                     titleContentColor = Black,
+                    navigationIconContentColor = Black,
+                    actionIconContentColor = Black
                 ),
                 navigationIcon = {
                     IconButton(onClick = onUpClick) {
