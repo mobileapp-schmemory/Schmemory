@@ -51,6 +51,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import site.jwojcik.schmemory.data.Scene
 import site.jwojcik.schmemory.data.Script
 import site.jwojcik.schmemory.data.Speech
+import site.jwojcik.schmemory.ui.theme.Black
 import site.jwojcik.schmemory.ui.theme.Blue
 import site.jwojcik.schmemory.ui.theme.Green
 import site.jwojcik.schmemory.ui.theme.Purple
@@ -111,7 +112,9 @@ fun ListScreen(
                                 focusedContainerColor = Color.White,
                                 unfocusedContainerColor = Color.White,
                                 focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent
+                                unfocusedIndicatorColor = Color.Transparent,
+                                focusedTextColor = Black,
+                                unfocusedTextColor = Black
                             ),
                             singleLine = true
                         )
@@ -126,12 +129,15 @@ fun ListScreen(
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = Color.Unspecified
+                            tint = Black
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Blue
+                    containerColor = Blue,
+                    titleContentColor = Black,
+                    navigationIconContentColor = Black,
+                    actionIconContentColor = Black
                 ),
                 actions = {
                     IconButton(onClick = {
@@ -154,7 +160,7 @@ fun ListScreen(
                         Icon(
                             Icons.Filled.CheckCircle,
                             contentDescription = "Select",
-                            tint = if (isSelectionMode) Green else Color.Unspecified
+                            tint = if (isSelectionMode) Green else Black
                         )
                     }
                     if (selectedItems.isNotEmpty()) {
