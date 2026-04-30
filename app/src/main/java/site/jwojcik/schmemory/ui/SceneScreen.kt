@@ -41,7 +41,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import site.jwojcik.schmemory.data.SceneLine
 import site.jwojcik.schmemory.ui.theme.Blue
 import site.jwojcik.schmemory.ui.theme.Black
+import site.jwojcik.schmemory.ui.theme.CharBlue
 import site.jwojcik.schmemory.ui.theme.White
+import site.jwojcik.schmemory.ui.theme.Yellow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -94,8 +96,8 @@ fun SceneScreen(
                         onClick = viewModel::toggleAnswer,
                         enabled = uiState.isUserLine,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (uiState.isUserLine) White else White.copy(alpha = 0.5f),
-                            contentColor = Blue
+                            containerColor = White,
+                            contentColor = CharBlue
                         )
                     ) {
                         Text(if (uiState.answerVisible) "Hide Line" else "Reveal Line")
@@ -161,7 +163,7 @@ fun RehearsalContent(
                         text = currentLine.characterName.uppercase(),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
-                        color = if (currentLine.characterName.equals(readingFor, ignoreCase = true)) Blue else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                        color = if (currentLine.characterName.equals(readingFor, ignoreCase = true)) CharBlue else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                     )
                     if (answerVisible) {
                         Text(
@@ -192,7 +194,7 @@ fun LineItem(line: SceneLine, isUser: Boolean) {
             text = line.characterName.uppercase(),
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
-            color = if (isUser) Blue else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+            color = if (isUser) CharBlue else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
         )
         Text(
             text = line.text,

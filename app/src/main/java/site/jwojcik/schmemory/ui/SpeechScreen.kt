@@ -40,6 +40,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import site.jwojcik.schmemory.data.SpeechLine
 import site.jwojcik.schmemory.ui.theme.Blue
 import site.jwojcik.schmemory.ui.theme.Black
+import site.jwojcik.schmemory.ui.theme.CharBlue
 import site.jwojcik.schmemory.ui.theme.White
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,7 +94,7 @@ fun SpeechScreen(
                         onClick = viewModel::toggleAnswer,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = White,
-                            contentColor = Blue
+                            contentColor = CharBlue
                         )
                     ) {
                         Text(if (uiState.answerVisible) "Hide Line" else "Reveal Line")
@@ -157,7 +158,7 @@ fun SpeechRehearsalContent(
                         text = "CURRENT LINE",
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
-                        color = Blue
+                        color = CharBlue
                     )
                     if (answerVisible) {
                         Text(
