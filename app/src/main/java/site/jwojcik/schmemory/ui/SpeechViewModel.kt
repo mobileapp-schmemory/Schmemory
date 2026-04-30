@@ -17,9 +17,9 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.stateIn
 import site.jwojcik.schmemory.Routes
 import site.jwojcik.schmemory.SchmemoryApplication
+import site.jwojcik.schmemory.data.SchmemoryRepository
 import site.jwojcik.schmemory.data.Speech
 import site.jwojcik.schmemory.data.SpeechLine
-import site.jwojcik.schmemory.data.SchmemoryRepository
 
 class SpeechViewModel(
     savedStateHandle: SavedStateHandle,
@@ -30,71 +30,63 @@ class SpeechViewModel(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = (this[APPLICATION_KEY] as SchmemoryApplication)
-                // Corrected: Call SpeechViewModel constructor, not SpeechScreen
                 SpeechViewModel(this.createSavedStateHandle(), application.schmemoryRepository)
             }
         }
     }
 
     private val speechId: Long = savedStateHandle.toRoute<Routes.Speech>().speechId
-
     private val currLineNum = MutableStateFlow(1)
-    private val currLine = MutableStateFlow(
-        SpeechLine(id = 0L, speechId = 0, order = 0, text = "")
-    )
-    private val answerVisible = MutableStateFlow(true)
+    private val answerVisible = MutableStateFlow(false)
 
-    // Corrected: Consistent naming with SpeechLineScreenUiState
     val uiState: StateFlow<SpeechLineScreenUiState> =
         combine(
             schmRepo.getSpeech(speechId).filterNotNull(),
             schmRepo.getSpeechLines(speechId),
             currLineNum,
-            currLine,
             answerVisible
-        ) { speech, lines, currNum, line, ansVisible ->
+        ) { speech, lines, currNum, ansVisible ->
+            val sortedLines = lines.sortedBy { it.order }
+            val currentLineIndex = (currNum - 1).coerceIn(0, (sortedLines.size - 1).coerceAtLeast(0))
+            val currentLine = if (sortedLines.isNotEmpty()) sortedLines[currentLineIndex] else null
+
             SpeechLineScreenUiState(
                 speech = speech,
-                lineList = lines,
-                currSpeechLine = if (line.id == 0L && lines.isNotEmpty()) lines.first()
-                else if (lines.isEmpty()) line
-                else lines.getOrElse(currNum - 1) { lines.first() },
+                lineList = sortedLines,
+                currSpeechLine = currentLine ?: SpeechLine(0, 0, 0, ""),
+                previousLines = if (currentLine != null) sortedLines.take(currentLineIndex) else emptyList(),
                 currSpeechLineNum = currNum,
-                totalSpeechLines = lines.size,
+                totalSpeechLines = sortedLines.size,
                 answerVisible = ansVisible
             )
         }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000L),
-                // Corrected: Added required initial values
                 initialValue = SpeechLineScreenUiState(
                     speech = Speech(0, ""),
-                    currSpeechLine = SpeechLine(0, 0, 0, "",)
+                    currSpeechLine = SpeechLine(0, 0, 0, "")
                 )
             )
 
     fun prevSpeechLine() {
-        if (uiState.value.totalSpeechLines == 0) return
-        val index = (uiState.value.currSpeechLineNum - 2 + uiState.value.totalSpeechLines) %
-                uiState.value.totalSpeechLines
-        currLine.value = uiState.value.lineList[index]
-        currLineNum.value = index + 1
+        val state = uiState.value
+        if (state.lineList.isEmpty()) return
+        
+        currLineNum.value = if (currLineNum.value > 1) currLineNum.value - 1 else state.lineList.size
+        answerVisible.value = false
     }
 
     fun nextSpeechLine() {
-        if (uiState.value.totalSpeechLines == 0) return
-        val index = uiState.value.currSpeechLineNum % uiState.value.totalSpeechLines
-        currLine.value = uiState.value.lineList[index]
-        currLineNum.value = index + 1
+        val state = uiState.value
+        if (state.lineList.isEmpty()) return
+        
+        currLineNum.value = if (currLineNum.value < state.lineList.size) currLineNum.value + 1 else 1
+        answerVisible.value = false
     }
 
     fun toggleAnswer() {
         answerVisible.value = !answerVisible.value
-    }
-
-    fun deleteSpeechLine() {
-        // TODO: Complete this function
     }
 }
 
@@ -102,7 +94,8 @@ data class SpeechLineScreenUiState(
     val speech: Speech,
     val currSpeechLine: SpeechLine,
     val lineList: List<SpeechLine> = emptyList(),
+    val previousLines: List<SpeechLine> = emptyList(),
     val currSpeechLineNum: Int = 1,
     val totalSpeechLines: Int = 0,
-    val answerVisible: Boolean = true
+    val answerVisible: Boolean = false
 )
