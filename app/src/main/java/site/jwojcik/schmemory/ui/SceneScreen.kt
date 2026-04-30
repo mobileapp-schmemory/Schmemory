@@ -40,7 +40,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import site.jwojcik.schmemory.data.SceneLine
 import site.jwojcik.schmemory.ui.theme.Blue
-import site.jwojcik.schmemory.ui.theme.Yellow
+import site.jwojcik.schmemory.ui.theme.Black
+import site.jwojcik.schmemory.ui.theme.White
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,7 +54,7 @@ fun SceneScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
-        containerColor = Yellow,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = { 
@@ -67,13 +68,18 @@ fun SceneScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Blue)
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Blue,
+                    titleContentColor = Black,
+                    navigationIconContentColor = Black,
+                    actionIconContentColor = Black
+                )
             )
         },
         bottomBar = {
             BottomAppBar(
                 containerColor = Blue,
-                contentColor = Color.White
+                contentColor = Black
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
@@ -88,7 +94,7 @@ fun SceneScreen(
                         onClick = viewModel::toggleAnswer,
                         enabled = uiState.isUserLine,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (uiState.isUserLine) Color.White else Color.White.copy(alpha = 0.5f),
+                            containerColor = if (uiState.isUserLine) White else White.copy(alpha = 0.5f),
                             contentColor = Blue
                         )
                     ) {
@@ -112,7 +118,10 @@ fun SceneScreen(
             )
         } else {
             Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
-                Text("No lines in this scene. Go to Edit to add some!")
+                Text(
+                    "No lines in this scene. Go to Edit to add some!",
+                    color = MaterialTheme.colorScheme.onBackground
+                )
             }
         }
     }
@@ -152,14 +161,14 @@ fun RehearsalContent(
                         text = currentLine.characterName.uppercase(),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
-                        color = if (currentLine.characterName.equals(readingFor, ignoreCase = true)) Blue else Color.DarkGray
+                        color = if (currentLine.characterName.equals(readingFor, ignoreCase = true)) Blue else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                     )
                     if (answerVisible) {
                         Text(
                             text = currentLine.text,
                             fontSize = 22.sp,
                             modifier = Modifier.padding(top = 4.dp),
-                            color = Color.Black
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                     } else {
                         Box(
@@ -167,7 +176,7 @@ fun RehearsalContent(
                                 .padding(top = 4.dp)
                                 .fillMaxWidth()
                                 .height(48.dp)
-                                .background(Color.LightGray.copy(alpha = 0.3f))
+                                .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f))
                         )
                     }
                 }
@@ -183,14 +192,18 @@ fun LineItem(line: SceneLine, isUser: Boolean) {
             text = line.characterName.uppercase(),
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
-            color = if (isUser) Blue else Color.Gray
+            color = if (isUser) Blue else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
         )
         Text(
             text = line.text,
             fontSize = 18.sp,
-            color = if (isUser) Color.Black else Color.DarkGray,
+            color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(top = 2.dp)
         )
-        HorizontalDivider(modifier = Modifier.padding(top = 8.dp), thickness = 0.5.dp, color = Color.LightGray)
+        HorizontalDivider(
+            modifier = Modifier.padding(top = 8.dp), 
+            thickness = 0.5.dp, 
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.12f)
+        )
     }
 }
