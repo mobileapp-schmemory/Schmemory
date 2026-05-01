@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -140,23 +141,15 @@ fun HomePageScreen(
         }
 
 
-        // Logo Button
-        Button(
+        //Logo Button
+        RotatingScallopedLogo(
             onClick = { showSmallButtons = !showSmallButtons },
             modifier = Modifier.size(240.dp),
-            shape = CircleShape,
             contentPadding = PaddingValues(0.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Blue
             )
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = "Home Button",
-                modifier = Modifier.size(200.dp),
-                tint = Color.Unspecified
-            )
-        }
+        )
     }
 }
 
@@ -201,7 +194,7 @@ fun MorphingButton(
             modifier = Modifier.size(64.dp),
             tint = Color.Unspecified
         )
-        RotatingScallopedProfilePic(iconRes, contentDescription)
+        RotatingScallopedButton(iconRes, contentDescription)
     }
 }
 
@@ -217,8 +210,7 @@ class CustomRotatingMorphShape(
         layoutDirection: LayoutDirection,
         density: Density
     ): Outline {
-        // Below assumes that you haven't changed the default radius of 1f, nor the centerX and centerY of 0f
-        // By default this stretches the path to the size of the container, if you don't want stretching, use the same size.width for both x and y.
+        matrix.reset()
         matrix.scale(size.width / 2f, size.height / 2f)
         matrix.translate(1f, 1f)
         matrix.rotateZ(rotation)
@@ -230,7 +222,7 @@ class CustomRotatingMorphShape(
     }
 }
 @Composable
-private fun RotatingScallopedProfilePic(
+private fun RotatingScallopedButton(
     iconRes: Int,
     contentDescription: String
     ) {
@@ -284,7 +276,71 @@ private fun RotatingScallopedProfilePic(
                         animatedRotation.value
                     )
                 )
-                .size(75.dp)
+                .size(90.dp)
+        )
+    }
+}
+
+@Composable
+private fun RotatingScallopedLogo(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    colors: ButtonColors = ButtonDefaults.buttonColors(containerColor = Blue)
+) {
+    val shapeA = remember {
+        RoundedPolygon(
+            12,
+            rounding = CornerRounding(0.2f)
+        )
+    }
+    val shapeB = remember {
+        RoundedPolygon.star(
+            12,
+            rounding = CornerRounding(0.2f)
+        )
+    }
+    val morph = remember {
+        Morph(shapeA, shapeB)
+    }
+    val infiniteTransition = rememberInfiniteTransition("infinite outline movement")
+    val animatedProgress = infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            tween(2000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "animatedMorphProgress"
+    )
+    val animatedRotation = infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            tween(6000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "animatedRotation"
+    )
+
+    val morphShape = CustomRotatingMorphShape(
+        morph,
+        animatedProgress.value,
+        animatedRotation.value
+    )
+
+    Button(
+        onClick = onClick,
+        modifier = modifier,
+        shape = morphShape,
+        contentPadding = contentPadding,
+        colors = colors
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.logo),
+            contentDescription = "Home Button",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
         )
     }
 }
