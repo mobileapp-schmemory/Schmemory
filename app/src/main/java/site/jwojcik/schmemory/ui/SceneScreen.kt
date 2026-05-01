@@ -6,10 +6,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -154,7 +156,25 @@ fun SceneScreen(
                 totalTimeMillis = uiState.totalTimeMillis,
                 modifier = Modifier
                     .padding(innerPadding)
-                    .fillMaxSize()
+                    .fillMaxSize(),
+                onShareClick = {
+                    val seconds = (uiState.totalTimeMillis ?: 0) / 1000
+                    val minutes = seconds / 60
+                    val remainingSeconds = seconds % 60
+                    val timeString =
+                        if (minutes > 0) "${minutes}m ${remainingSeconds}s" else "${remainingSeconds}s"
+
+                    val sendIntent: Intent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(
+                            Intent.EXTRA_TEXT,
+                            "I just ran my scene '${uiState.scene.name}' in $timeString using Schmemory!"
+                        )
+                        type = "text/plain"
+                    }
+                    val shareIntent = Intent.createChooser(sendIntent, null)
+                    context.startActivity(shareIntent)
+                }
             )
         } else {
             Box(
@@ -179,7 +199,8 @@ fun RehearsalContent(
     readingFor: String,
     answerVisible: Boolean,
     totalTimeMillis: Long?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onShareClick: () -> Unit = {}
 ) {
     val listState = rememberLazyListState()
 
@@ -270,6 +291,23 @@ fun RehearsalContent(
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.padding(top = 8.dp)
                         )
+
+                        Button(
+                            onClick = onShareClick,
+                            modifier = Modifier.padding(top = 16.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = CharBlue,
+                                contentColor = White
+                            )
+                        ) {
+                            Icon(
+                                Icons.Default.Share,
+                                contentDescription = null,
+                                modifier = Modifier.height(18.dp)
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text("Share Results")
+                        }
                     }
                 }
             }
