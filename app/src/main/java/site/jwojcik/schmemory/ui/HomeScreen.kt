@@ -425,7 +425,7 @@ fun ThoughtBubble(text: String, modifier: Modifier = Modifier) {
             modifier = Modifier
                 .background(Blue, shape = RoundedCornerShape(24.dp))
                 .padding(horizontal = 24.dp, vertical = 12.dp)
-                .clickable{easterEggClicks++; if (easterEggClicks == 15) {logo = R.drawable.anya} },
+                .clickable{easterEggClicks++; if (easterEggClicks == 15) {logo = R.drawable.anya} else {logo = R.drawable.logo} },
 
             ) {
             Text(
