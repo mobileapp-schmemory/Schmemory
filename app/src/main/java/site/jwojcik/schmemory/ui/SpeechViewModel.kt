@@ -52,23 +52,25 @@ class SpeechViewModel(
         val sortedLines = lines.sortedBy { it.order }
         val isFinished = sortedLines.isNotEmpty() && currNum > sortedLines.size
         val currentLineIndex = currNum - 1
-        val currentLine =
-            if (isFinished) null else if (sortedLines.isNotEmpty() && currentLineIndex < sortedLines.size) sortedLines[currentLineIndex] else null
-
+        
         // isAtEnd means we have revealed the last line or passed it
-        val isAtEnd =
-            sortedLines.isNotEmpty() && (isFinished || (currNum == sortedLines.size && ansVisible))
+        val isAtEnd = sortedLines.isNotEmpty() && (isFinished || (currNum == sortedLines.size && ansVisible))
+
+        val currentLine = if (sortedLines.isNotEmpty()) {
+            val index = currentLineIndex.coerceIn(0, sortedLines.size - 1)
+            sortedLines[index]
+        } else {
+            SpeechLine(0, 0, 0, "")
+        }
 
         SpeechLineScreenUiState(
             speech = speech,
             lineList = sortedLines,
-            currSpeechLine = currentLine ?: SpeechLine(0, 0, 0, ""),
+            currSpeechLine = currentLine,
             previousLines = sortedLines.take(
-                if (isFinished) sortedLines.size else currentLineIndex.coerceAtLeast(
-                    0
-                )
+                if (isAtEnd) sortedLines.size else currentLineIndex.coerceAtLeast(0)
             ),
-            currSpeechLineNum = if (isFinished) sortedLines.size else currNum,
+            currSpeechLineNum = if (isAtEnd) sortedLines.size else currNum,
             totalSpeechLines = sortedLines.size,
             answerVisible = ansVisible,
             isAtEnd = isAtEnd,
@@ -76,12 +78,12 @@ class SpeechViewModel(
             totalTimeMillis = totalTime
         )
     }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000L),
-            initialValue = SpeechLineScreenUiState(
-                speech = Speech(0, ""), currSpeechLine = SpeechLine(0, 0, 0, "")
-            )
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000L),
+        initialValue = SpeechLineScreenUiState(
+            speech = Speech(0, ""), currSpeechLine = SpeechLine(0, 0, 0, "")
         )
+    )
 
     init {
         // Reactive timer stop logic
@@ -107,9 +109,9 @@ class SpeechViewModel(
         val state = uiState.value
         if (state.lineList.isEmpty()) return
 
-        if (state.isFinished) {
+        if (state.isAtEnd) {
             currLineNum.value = state.lineList.size
-            answerVisible.value = true
+            answerVisible.value = false
             return
         }
 

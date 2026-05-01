@@ -152,6 +152,7 @@ fun SpeechScreen(
                 currentLine = uiState.currSpeechLine,
                 answerVisible = uiState.answerVisible,
                 totalTimeMillis = uiState.totalTimeMillis,
+                isAtEnd = uiState.isAtEnd,
                 modifier = Modifier
                     .padding(innerPadding)
                     .fillMaxSize(),
@@ -196,15 +197,16 @@ fun SpeechRehearsalContent(
     currentLine: SpeechLine,
     answerVisible: Boolean,
     totalTimeMillis: Long?,
+    isAtEnd: Boolean,
     modifier: Modifier = Modifier,
     onShareClick: () -> Unit = {}
 ) {
     val listState = rememberLazyListState()
 
-    // Automatically scroll to the bottom when new lines are added or your line is revealed
-    LaunchedEffect(previousLines.size, answerVisible, totalTimeMillis) {
-        if (previousLines.isNotEmpty() || answerVisible || totalTimeMillis != null) {
-            val lastIndex = if (totalTimeMillis != null) previousLines.size + 1
+    // Automatically scroll to the bottom when new lines are added, your line is revealed, or finished
+    LaunchedEffect(previousLines.size, answerVisible, isAtEnd) {
+        if (previousLines.isNotEmpty() || answerVisible || isAtEnd) {
+            val lastIndex = if (isAtEnd) previousLines.size + 1
             else if (answerVisible) previousLines.size
             else (previousLines.size - 1).coerceAtLeast(0)
             listState.animateScrollToItem(lastIndex)
@@ -224,7 +226,7 @@ fun SpeechRehearsalContent(
             }
 
             item {
-                if (currentLine.id != 0L) {
+                if (!isAtEnd && currentLine.id != 0L) {
                     Column(modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 8.dp)) {
@@ -254,7 +256,7 @@ fun SpeechRehearsalContent(
                 }
             }
 
-            if (totalTimeMillis != null) {
+            if (isAtEnd && totalTimeMillis != null) {
                 item {
                     val seconds = totalTimeMillis / 1000
                     val minutes = seconds / 60
