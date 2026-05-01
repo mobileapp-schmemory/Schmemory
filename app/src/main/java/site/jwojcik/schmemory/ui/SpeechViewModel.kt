@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import site.jwojcik.schmemory.Routes
 import site.jwojcik.schmemory.SchmemoryApplication
 import site.jwojcik.schmemory.data.SchmemoryRepository
@@ -22,8 +23,7 @@ import site.jwojcik.schmemory.data.Speech
 import site.jwojcik.schmemory.data.SpeechLine
 
 class SpeechViewModel(
-    savedStateHandle: SavedStateHandle,
-    private val schmRepo: SchmemoryRepository
+    savedStateHandle: SavedStateHandle, schmRepo: SchmemoryRepository
 ) : ViewModel() {
 
     companion object {
@@ -40,58 +40,65 @@ class SpeechViewModel(
     private val answerVisible = MutableStateFlow(false)
 
     private var startTimeMillis: Long? = null
-    private val totalTimeMillis = MutableStateFlow<Long?>(null)
+    private val _totalTimeMillis = MutableStateFlow<Long?>(null)
 
-    val uiState: StateFlow<SpeechLineScreenUiState> =
-        combine(
-            schmRepo.getSpeech(speechId).filterNotNull(),
-            schmRepo.getSpeechLines(speechId),
-            currLineNum,
-            answerVisible,
-            totalTimeMillis
-        ) { speech, lines, currNum, ansVisible, totalTime ->
-            val sortedLines = lines.sortedBy { it.order }
-            val isFinished = sortedLines.isNotEmpty() && currNum > sortedLines.size
-            val currentLineIndex = currNum - 1
-            val currentLine = if (isFinished) null else if (sortedLines.isNotEmpty() && currentLineIndex < sortedLines.size) sortedLines[currentLineIndex] else null
+    val uiState: StateFlow<SpeechLineScreenUiState> = combine(
+        schmRepo.getSpeech(speechId).filterNotNull(),
+        schmRepo.getSpeechLines(speechId),
+        currLineNum,
+        answerVisible,
+        _totalTimeMillis
+    ) { speech, lines, currNum, ansVisible, totalTime ->
+        val sortedLines = lines.sortedBy { it.order }
+        val isFinished = sortedLines.isNotEmpty() && currNum > sortedLines.size
+        val currentLineIndex = currNum - 1
+        val currentLine =
+            if (isFinished) null else if (sortedLines.isNotEmpty() && currentLineIndex < sortedLines.size) sortedLines[currentLineIndex] else null
 
-            // isAtEnd means we have revealed the last line
-            val isAtEnd = sortedLines.isNotEmpty() && (isFinished || (currNum == sortedLines.size && ansVisible))
+        // isAtEnd means we have revealed the last line or passed it
+        val isAtEnd =
+            sortedLines.isNotEmpty() && (isFinished || (currNum == sortedLines.size && ansVisible))
 
-            SpeechLineScreenUiState(
-                speech = speech,
-                lineList = sortedLines,
-                currSpeechLine = currentLine ?: SpeechLine(0, 0, 0, ""),
-                previousLines = sortedLines.take(if (isFinished) sortedLines.size else currentLineIndex.coerceAtLeast(0)),
-                currSpeechLineNum = if (isFinished) sortedLines.size else currNum,
-                totalSpeechLines = sortedLines.size,
-                answerVisible = ansVisible,
-                isAtEnd = isAtEnd,
-                isFinished = isFinished,
-                totalTimeMillis = totalTime
-            )
-        }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000L),
-                initialValue = SpeechLineScreenUiState(
-                    speech = Speech(0, ""),
-                    currSpeechLine = SpeechLine(0, 0, 0, "")
+        SpeechLineScreenUiState(
+            speech = speech,
+            lineList = sortedLines,
+            currSpeechLine = currentLine ?: SpeechLine(0, 0, 0, ""),
+            previousLines = sortedLines.take(
+                if (isFinished) sortedLines.size else currentLineIndex.coerceAtLeast(
+                    0
                 )
+            ),
+            currSpeechLineNum = if (isFinished) sortedLines.size else currNum,
+            totalSpeechLines = sortedLines.size,
+            answerVisible = ansVisible,
+            isAtEnd = isAtEnd,
+            isFinished = isFinished,
+            totalTimeMillis = totalTime
+        )
+    }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = SpeechLineScreenUiState(
+                speech = Speech(0, ""), currSpeechLine = SpeechLine(0, 0, 0, "")
             )
+        )
+
+    init {
+        // Reactive timer stop logic
+        viewModelScope.launch {
+            uiState.collect { state ->
+                if (state.isAtEnd && _totalTimeMillis.value == null) {
+                    startTimeMillis?.let { start ->
+                        _totalTimeMillis.value = System.currentTimeMillis() - start
+                    }
+                }
+            }
+        }
+    }
 
     private fun startTimerIfNeeded() {
         if (startTimeMillis == null) {
             startTimeMillis = System.currentTimeMillis()
-        }
-    }
-
-    private fun checkFinish() {
-        val state = uiState.value
-        if (state.isAtEnd && totalTimeMillis.value == null) {
-            startTimeMillis?.let { start ->
-                totalTimeMillis.value = System.currentTimeMillis() - start
-            }
         }
     }
 
@@ -103,7 +110,6 @@ class SpeechViewModel(
         if (state.isFinished) {
             currLineNum.value = state.lineList.size
             answerVisible.value = true
-            checkFinish()
             return
         }
 
@@ -111,7 +117,6 @@ class SpeechViewModel(
             currLineNum.value -= 1
             answerVisible.value = false
         }
-        checkFinish()
     }
 
     fun nextSpeechLine() {
@@ -132,12 +137,11 @@ class SpeechViewModel(
                 answerVisible.value = true
             }
         }
-        checkFinish()
     }
 
     private fun restart() {
         startTimeMillis = null
-        totalTimeMillis.value = null
+        _totalTimeMillis.value = null
         currLineNum.value = 1
         answerVisible.value = false
     }
@@ -145,7 +149,6 @@ class SpeechViewModel(
     fun toggleAnswer() {
         startTimerIfNeeded()
         answerVisible.value = !answerVisible.value
-        checkFinish()
     }
 }
 

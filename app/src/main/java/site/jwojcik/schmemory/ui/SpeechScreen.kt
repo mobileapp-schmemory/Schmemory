@@ -38,12 +38,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import site.jwojcik.schmemory.data.SpeechLine
-import site.jwojcik.schmemory.ui.theme.Blue
 import site.jwojcik.schmemory.ui.theme.Black
+import site.jwojcik.schmemory.ui.theme.Blue
 import site.jwojcik.schmemory.ui.theme.CharBlue
 import site.jwojcik.schmemory.ui.theme.White
 
@@ -63,7 +62,8 @@ fun SpeechScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    val titleText = if (uiState.speech.name.length > 20) uiState.speech.name.take(20) + "..." else uiState.speech.name
+                    val titleText =
+                        if (uiState.speech.name.length > 20) uiState.speech.name.take(20) + "..." else uiState.speech.name
                     Text(
                         text = if (uiState.totalSpeechLines == 0) titleText
                         else "$titleText (${uiState.currSpeechLineNum}/${uiState.totalSpeechLines})"
@@ -88,7 +88,9 @@ fun SpeechScreen(
                 contentColor = Black
             ) {
                 Box(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
                 ) {
                     IconButton(
                         onClick = viewModel::prevSpeechLine,
@@ -115,7 +117,10 @@ fun SpeechScreen(
                         IconButton(onClick = {
                             val sendIntent: Intent = Intent().apply {
                                 action = Intent.ACTION_SEND
-                                putExtra(Intent.EXTRA_TEXT, "I'm Schmemorizing!\n${uiState.speech.name}: ${uiState.currSpeechLine.text}")
+                                putExtra(
+                                    Intent.EXTRA_TEXT,
+                                    "I'm Schmemorizing!\n${uiState.speech.name}: ${uiState.currSpeechLine.text}"
+                                )
                                 type = "text/plain"
                             }
                             val shareIntent = Intent.createChooser(sendIntent, null)
@@ -128,7 +133,10 @@ fun SpeechScreen(
                             if (uiState.isAtEnd) {
                                 Icon(Icons.Default.Refresh, contentDescription = "Restart")
                             } else {
-                                Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next")
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ArrowForward,
+                                    contentDescription = "Next"
+                                )
                             }
                         }
                     }
@@ -142,10 +150,17 @@ fun SpeechScreen(
                 currentLine = uiState.currSpeechLine,
                 answerVisible = uiState.answerVisible,
                 totalTimeMillis = uiState.totalTimeMillis,
-                modifier = Modifier.padding(innerPadding).fillMaxSize()
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
             )
         } else {
-            Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                contentAlignment = Alignment.Center
+            ) {
                 Text(
                     "No lines in this speech. Go to Edit to add some!",
                     color = MaterialTheme.colorScheme.onBackground
@@ -178,7 +193,9 @@ fun SpeechRehearsalContent(
     Column(modifier = modifier.padding(16.dp)) {
         LazyColumn(
             state = listState,
-            modifier = Modifier.weight(1f).fillMaxWidth(),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(previousLines) { line ->
@@ -187,7 +204,9 @@ fun SpeechRehearsalContent(
 
             item {
                 if (currentLine.id != 0L) {
-                    Column(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
+                    Column(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp)) {
                         Text(
                             text = "CURRENT LINE",
                             style = MaterialTheme.typography.labelLarge,
@@ -219,7 +238,8 @@ fun SpeechRehearsalContent(
                     val seconds = totalTimeMillis / 1000
                     val minutes = seconds / 60
                     val remainingSeconds = seconds % 60
-                    val timeString = if (minutes > 0) "${minutes}m ${remainingSeconds}s" else "${remainingSeconds}s"
+                    val timeString =
+                        if (minutes > 0) "${minutes}m ${remainingSeconds}s" else "${remainingSeconds}s"
 
                     Column(
                         modifier = Modifier

@@ -49,7 +49,7 @@ fun EditScreen(
     scriptId: Long,
     listType: SchmemoryListType,
     onUpClick: () -> Unit,
-    modifier: Modifier = Modifier,
+    //modifier: Modifier = Modifier,
     viewModel: EditViewModel = viewModel(factory = EditViewModel.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -73,7 +73,7 @@ fun EditScreen(
 
     if (showUnsavedDialog) {
         AlertDialog(
-            onDismissRequest = { showUnsavedDialog = false },
+            onDismissRequest = { },//showUnsavedDialog = false },
             title = { Text("Unsaved Changes") },
             text = { Text("You have unsaved changes. Are you sure you want to discard them?") },
             confirmButton = {
@@ -82,7 +82,7 @@ fun EditScreen(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showUnsavedDialog = false }) {
+                TextButton(onClick = { }) {//showUnsavedDialog = false }) {
                     Text("Cancel")
                 }
             }
@@ -155,9 +155,11 @@ fun EditScreen(
                 .padding(16.dp)
         ) {
             items(uiState.lines) { line ->
-                Column(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         if (line is SceneLine) {
                             OutlinedTextField(

@@ -38,12 +38,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import site.jwojcik.schmemory.data.SceneLine
-import site.jwojcik.schmemory.ui.theme.Blue
 import site.jwojcik.schmemory.ui.theme.Black
+import site.jwojcik.schmemory.ui.theme.Blue
 import site.jwojcik.schmemory.ui.theme.CharBlue
 import site.jwojcik.schmemory.ui.theme.White
 
@@ -63,7 +62,8 @@ fun SceneScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    val titleText = if (uiState.scene.name.length > 20) uiState.scene.name.take(20) + "..." else uiState.scene.name
+                    val titleText =
+                        if (uiState.scene.name.length > 20) uiState.scene.name.take(20) + "..." else uiState.scene.name
                     Text(
                         text = if (uiState.totalSceneLines == 0) titleText
                         else "$titleText (${uiState.currSceneLineNum}/${uiState.totalSceneLines})"
@@ -118,7 +118,10 @@ fun SceneScreen(
                         IconButton(onClick = {
                             val sendIntent: Intent = Intent().apply {
                                 action = Intent.ACTION_SEND
-                                putExtra(Intent.EXTRA_TEXT, "I'm Schmemorizing!\n${uiState.currSceneLine.characterName.uppercase()}: ${uiState.currSceneLine.text}")
+                                putExtra(
+                                    Intent.EXTRA_TEXT,
+                                    "I'm Schmemorizing!\n${uiState.currSceneLine.characterName.uppercase()}: ${uiState.currSceneLine.text}"
+                                )
                                 type = "text/plain"
                             }
                             val shareIntent = Intent.createChooser(sendIntent, null)
@@ -131,7 +134,10 @@ fun SceneScreen(
                             if (uiState.isAtEnd) {
                                 Icon(Icons.Default.Refresh, contentDescription = "Restart")
                             } else {
-                                Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next")
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ArrowForward,
+                                    contentDescription = "Next"
+                                )
                             }
                         }
                     }
@@ -146,10 +152,17 @@ fun SceneScreen(
                 readingFor = uiState.scene.readingFor,
                 answerVisible = uiState.answerVisible,
                 totalTimeMillis = uiState.totalTimeMillis,
-                modifier = Modifier.padding(innerPadding).fillMaxSize()
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
             )
         } else {
-            Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                contentAlignment = Alignment.Center
+            ) {
                 Text(
                     "No lines in this scene. Go to Edit to add some!",
                     color = MaterialTheme.colorScheme.onBackground
@@ -183,20 +196,33 @@ fun RehearsalContent(
     Column(modifier = modifier.padding(16.dp)) {
         LazyColumn(
             state = listState,
-            modifier = Modifier.weight(1f).fillMaxWidth(),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(previousLines) { line ->
-                LineItem(line = line, isUser = line.characterName.equals(readingFor, ignoreCase = true))
+                LineItem(
+                    line = line,
+                    isUser = line.characterName.equals(readingFor, ignoreCase = true)
+                )
             }
 
             item {
-                Column(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp)
+                ) {
                     Text(
                         text = currentLine.characterName.uppercase(),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
-                        color = if (currentLine.characterName.equals(readingFor, ignoreCase = true)) CharBlue else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                        color = if (currentLine.characterName.equals(
+                                readingFor,
+                                ignoreCase = true
+                            )
+                        ) CharBlue else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                     )
                     if (answerVisible) {
                         Text(
@@ -222,7 +248,8 @@ fun RehearsalContent(
                     val seconds = totalTimeMillis / 1000
                     val minutes = seconds / 60
                     val remainingSeconds = seconds % 60
-                    val timeString = if (minutes > 0) "${minutes}m ${remainingSeconds}s" else "${remainingSeconds}s"
+                    val timeString =
+                        if (minutes > 0) "${minutes}m ${remainingSeconds}s" else "${remainingSeconds}s"
 
                     Column(
                         modifier = Modifier
