@@ -50,29 +50,27 @@ class SceneViewModel(
         ) { scene, lines, currNum, ansVisible ->
             val sortedLines = lines.sortedBy { it.order }
             val currentLineIndex = currNum - 1
-            
-            val isFinished = currNum > sortedLines.size
-            val currentLine = if (isFinished) null else if (sortedLines.isNotEmpty() && currentLineIndex < sortedLines.size) sortedLines[currentLineIndex] else null
+            val currentLine = if (sortedLines.isNotEmpty() && currentLineIndex < sortedLines.size) sortedLines[currentLineIndex] else null
             
             val isUserLine = currentLine?.characterName?.equals(scene.readingFor, ignoreCase = true) ?: false
             
             // Auto-reveal if not user line
-            val effectiveAnsVisible = if (!isUserLine && !isFinished) true else ansVisible
+            val effectiveAnsVisible = if (!isUserLine && currentLine != null) true else ansVisible
 
-            // isAtEnd means we are on the last line and it's either not a user line or it's revealed, OR we are finished.
-            val isAtEnd = isFinished || (currNum == sortedLines.size && effectiveAnsVisible)
+            // isAtEnd means we are on the last line. 
+            // The Refresh icon should be shown here because there's no "Next" line.
+            val isAtEnd = sortedLines.isNotEmpty() && currNum == sortedLines.size
 
             SceneLineScreenUiState(
                 scene = scene,
                 lineList = sortedLines,
                 currSceneLine = currentLine ?: SceneLine(0, 0, 0, "", ""),
-                previousLines = if (isFinished) sortedLines else sortedLines.take(currentLineIndex.coerceAtLeast(0)),
-                currSceneLineNum = if (isFinished) sortedLines.size else currNum,
+                previousLines = sortedLines.take(currentLineIndex.coerceIn(0, sortedLines.size)),
+                currSceneLineNum = currNum.coerceAtMost(sortedLines.size),
                 totalSceneLines = sortedLines.size,
                 answerVisible = effectiveAnsVisible,
                 isUserLine = isUserLine,
-                isAtEnd = isAtEnd,
-                isFinished = isFinished
+                isAtEnd = isAtEnd
             )
         }
             .stateIn(
@@ -106,12 +104,6 @@ class SceneViewModel(
         val readingFor = state.scene.readingFor
         if (lines.isEmpty()) return
         
-        if (state.isFinished) {
-            currLineNum.value = lines.size
-            answerVisible.value = false
-            return
-        }
-
         val currentIndex = currLineNum.value - 1
         
         if (readingFor.isBlank()) {
@@ -143,19 +135,12 @@ class SceneViewModel(
         val readingFor = state.scene.readingFor
         if (lines.isEmpty()) return
         
-        if (state.isFinished) {
+        if (state.isAtEnd) {
             restart()
             return
         }
 
         val currentIndex = currLineNum.value - 1
-        
-        // If we are at the point where we would "finish"
-        if (state.isAtEnd) {
-            currLineNum.value = lines.size + 1
-            answerVisible.value = false
-            return
-        }
 
         if (readingFor.isBlank()) {
             currLineNum.value += 1
@@ -211,6 +196,5 @@ data class SceneLineScreenUiState(
     val totalSceneLines: Int = 0,
     val answerVisible: Boolean = false,
     val isUserLine: Boolean = false,
-    val isAtEnd: Boolean = false,
-    val isFinished: Boolean = false
+    val isAtEnd: Boolean = false
 )
