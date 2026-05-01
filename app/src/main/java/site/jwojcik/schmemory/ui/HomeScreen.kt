@@ -208,12 +208,12 @@ fun MorphingButton(
             },
         contentAlignment = Alignment.Center
     ) {
-        Icon(
+        /*Icon(
             painter = painterResource(id = iconRes),
             contentDescription = contentDescription,
             modifier = Modifier.size(64.dp),
             tint = Color.Unspecified
-        )
+        )*/
         RotatingScallopedButton(iconRes, contentDescription)
     }
 }
