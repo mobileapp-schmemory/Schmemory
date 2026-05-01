@@ -63,9 +63,10 @@ fun SpeechScreen(
         topBar = {
             TopAppBar(
                 title = { 
+                    val titleText = if (uiState.speech.name.length > 20) uiState.speech.name.take(20) + "..." else uiState.speech.name
                     Text(
-                        text = if (uiState.totalSpeechLines == 0) uiState.speech.name 
-                               else "${uiState.speech.name} (${uiState.currSpeechLineNum}/${uiState.totalSpeechLines})"
+                        text = if (uiState.totalSpeechLines == 0) titleText 
+                               else "$titleText (${uiState.currSpeechLineNum}/${uiState.totalSpeechLines})"
                     )
                 },
                 navigationIcon = {
@@ -124,7 +125,7 @@ fun SpeechScreen(
                         }
 
                         IconButton(onClick = viewModel::nextSpeechLine) {
-                            if (uiState.isAtEnd && uiState.answerVisible) {
+                            if (uiState.isAtEnd) {
                                 Icon(Icons.Default.Refresh, contentDescription = "Restart")
                             } else {
                                 Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next")
@@ -181,28 +182,30 @@ fun SpeechRehearsalContent(
             }
             
             item {
-                Column(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
-                    Text(
-                        text = "CURRENT LINE",
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = CharBlue
-                    )
-                    if (answerVisible) {
+                if (currentLine.id != 0L) {
+                    Column(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
                         Text(
-                            text = currentLine.text,
-                            fontSize = 22.sp,
-                            modifier = Modifier.padding(top = 4.dp),
-                            color = MaterialTheme.colorScheme.onBackground
+                            text = "CURRENT LINE",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = CharBlue
                         )
-                    } else {
-                        Box(
-                            modifier = Modifier
-                                .padding(top = 4.dp)
-                                .fillMaxWidth()
-                                .height(48.dp)
-                                .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f))
-                        )
+                        if (answerVisible) {
+                            Text(
+                                text = currentLine.text,
+                                fontSize = 22.sp,
+                                modifier = Modifier.padding(top = 4.dp),
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .padding(top = 4.dp)
+                                    .fillMaxWidth()
+                                    .height(48.dp)
+                                    .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f))
+                            )
+                        }
                     }
                 }
             }

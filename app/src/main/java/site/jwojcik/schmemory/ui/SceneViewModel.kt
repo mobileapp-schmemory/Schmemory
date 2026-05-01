@@ -50,14 +50,17 @@ class SceneViewModel(
         ) { scene, lines, currNum, ansVisible ->
             val sortedLines = lines.sortedBy { it.order }
             val currentLineIndex = currNum - 1
-            val currentLine = if (sortedLines.isNotEmpty() && currentLineIndex < sortedLines.size) sortedLines[currentLineIndex] else null
+            
+            val isFinished = currNum > sortedLines.size
+            val currentLine = if (isFinished) null else if (sortedLines.isNotEmpty() && currentLineIndex < sortedLines.size) sortedLines[currentLineIndex] else null
             
             val isUserLine = currentLine?.characterName?.equals(scene.readingFor, ignoreCase = true) ?: false
-            val isFinished = currNum > sortedLines.size
             
-            // isAtEnd means we are on the last step of the current practice session
-            // Either we are on the last line and it's revealed/cue, or we are finished.
-            val isAtEnd = isFinished || (currNum == sortedLines.size && (!isUserLine || ansVisible))
+            // Auto-reveal if not user line
+            val effectiveAnsVisible = if (!isUserLine && !isFinished) true else ansVisible
+
+            // isAtEnd means we are on the last line and it's either not a user line or it's revealed, OR we are finished.
+            val isAtEnd = isFinished || (currNum == sortedLines.size && effectiveAnsVisible)
 
             SceneLineScreenUiState(
                 scene = scene,
@@ -66,7 +69,7 @@ class SceneViewModel(
                 previousLines = if (isFinished) sortedLines else sortedLines.take(currentLineIndex.coerceAtLeast(0)),
                 currSceneLineNum = if (isFinished) sortedLines.size else currNum,
                 totalSceneLines = sortedLines.size,
-                answerVisible = ansVisible,
+                answerVisible = effectiveAnsVisible,
                 isUserLine = isUserLine,
                 isAtEnd = isAtEnd,
                 isFinished = isFinished

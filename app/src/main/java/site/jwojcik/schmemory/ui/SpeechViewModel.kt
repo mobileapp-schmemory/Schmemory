@@ -47,24 +47,23 @@ class SpeechViewModel(
             answerVisible
         ) { speech, lines, currNum, ansVisible ->
             val sortedLines = lines.sortedBy { it.order }
+            val isFinished = currNum > sortedLines.size
             val currentLineIndex = currNum - 1
-            val currentLine = if (sortedLines.isNotEmpty() && currentLineIndex < sortedLines.size) sortedLines[currentLineIndex] else null
+            val currentLine = if (isFinished) null else if (sortedLines.isNotEmpty() && currentLineIndex < sortedLines.size) sortedLines[currentLineIndex] else null
 
-            val isAtEnd = if (sortedLines.isEmpty()) true
-                          else if (currNum > sortedLines.size) true
-                          else if (currNum == sortedLines.size && ansVisible) true
-                          else false
+            // Refresh icon shown when finished OR on last line and it's revealed
+            val isAtEnd = isFinished || (currNum == sortedLines.size && ansVisible)
 
             SpeechLineScreenUiState(
                 speech = speech,
                 lineList = sortedLines,
                 currSpeechLine = currentLine ?: SpeechLine(0, 0, 0, ""),
-                previousLines = sortedLines.take(currentLineIndex.coerceIn(0, sortedLines.size)),
-                currSpeechLineNum = currNum.coerceAtMost(sortedLines.size),
+                previousLines = sortedLines.take(if (isFinished) sortedLines.size else currentLineIndex.coerceAtLeast(0)),
+                currSpeechLineNum = if (isFinished) sortedLines.size else currNum,
                 totalSpeechLines = sortedLines.size,
                 answerVisible = ansVisible,
                 isAtEnd = isAtEnd,
-                isFinished = currNum > sortedLines.size
+                isFinished = isFinished
             )
         }
             .stateIn(
@@ -80,31 +79,29 @@ class SpeechViewModel(
         val state = uiState.value
         if (state.lineList.isEmpty()) return
         
+        if (state.isFinished) {
+            currLineNum.value = state.lineList.size
+            answerVisible.value = true // Keep revealed when coming back from finish
+            return
+        }
+
         if (currLineNum.value > 1) {
             currLineNum.value -= 1
+            answerVisible.value = false
         }
-        answerVisible.value = false
     }
 
     fun nextSpeechLine() {
         val state = uiState.value
         if (state.lineList.isEmpty()) return
         
-        if (state.isFinished) {
+        if (state.isAtEnd) {
             restart()
             return
         }
 
-        if (state.isAtEnd && state.answerVisible) {
-            currLineNum.value = state.lineList.size + 1
-            answerVisible.value = false
-            return
-        }
-
         if (currLineNum.value <= state.lineList.size) {
-            // Only advance if answer is visible (to force reveal before next?)
-            // Actually, keep it simple for now, but usually you want to reveal before next.
-            if (state.answerVisible) {
+            if (answerVisible.value) {
                 currLineNum.value += 1
                 answerVisible.value = false
             } else {
