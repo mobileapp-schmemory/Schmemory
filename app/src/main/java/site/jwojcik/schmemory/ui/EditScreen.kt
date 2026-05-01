@@ -40,8 +40,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import site.jwojcik.schmemory.data.SceneLine
-import site.jwojcik.schmemory.ui.theme.Blue
 import site.jwojcik.schmemory.ui.theme.Black
+import site.jwojcik.schmemory.ui.theme.Blue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,7 +98,9 @@ fun EditScreen(
                         OutlinedTextField(
                             value = it.name,
                             onValueChange = { newName -> viewModel.updateScriptName(newName) },
-                            modifier = Modifier.fillMaxWidth().padding(end = 8.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(end = 8.dp),
                             textStyle = MaterialTheme.typography.titleLarge.copy(color = Black),
                             singleLine = true,
                             colors = OutlinedTextFieldDefaults.colors(
@@ -115,25 +117,25 @@ fun EditScreen(
                 navigationIcon = {
                     IconButton(onClick = handleBack) {
                         Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack, 
+                            Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
                             tint = Black
                         )
                     }
                 },
                 actions = {
-                    IconButton(onClick = { 
+                    IconButton(onClick = {
                         viewModel.save(onSuccess = onUpClick)
                     }) {
                         Icon(
-                            Icons.Default.Check, 
+                            Icons.Default.Check,
                             contentDescription = "Save",
                             tint = Black
                         )
                     }
                     IconButton(onClick = { viewModel.addLine() }) {
                         Icon(
-                            Icons.Default.Add, 
+                            Icons.Default.Add,
                             contentDescription = "Add Line",
                             tint = Black
                         )
@@ -153,21 +155,25 @@ fun EditScreen(
                 .padding(16.dp)
         ) {
             items(uiState.lines) { line ->
-                Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         if (line is SceneLine) {
                             OutlinedTextField(
                                 value = line.characterName,
                                 onValueChange = { viewModel.updateCharacterName(line, it) },
-                                label = { 
+                                label = {
                                     Text(
                                         "Character",
                                         modifier = Modifier
                                             .background(MaterialTheme.colorScheme.surfaceVariant)
                                             .padding(horizontal = 4.dp)
-                                    ) 
+                                    )
                                 },
-                                modifier = Modifier.weight(0.42f).padding(end = 8.dp),
+                                modifier = Modifier
+                                    .weight(0.42f)
+                                    .padding(end = 8.dp),
                                 singleLine = true,
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedTextColor = Black,
@@ -184,13 +190,13 @@ fun EditScreen(
                         OutlinedTextField(
                             value = line.text,
                             onValueChange = { viewModel.updateLineText(line, it) },
-                            label = { 
+                            label = {
                                 Text(
                                     "Line Text",
                                     modifier = Modifier
                                         .background(MaterialTheme.colorScheme.surfaceVariant)
                                         .padding(horizontal = 4.dp)
-                                ) 
+                                )
                             },
                             modifier = Modifier.weight(0.58f),
                             colors = OutlinedTextFieldDefaults.colors(
@@ -205,7 +211,11 @@ fun EditScreen(
                             )
                         )
                         IconButton(onClick = { viewModel.deleteLine(line) }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Delete Line", tint = Color.Red)
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = "Delete Line",
+                                tint = Color.Red
+                            )
                         }
                     }
                     HorizontalDivider(

@@ -39,20 +39,24 @@ class SpeechViewModel(
     private val currLineNum = MutableStateFlow(1)
     private val answerVisible = MutableStateFlow(false)
 
+    private var startTimeMillis: Long? = null
+    private val totalTimeMillis = MutableStateFlow<Long?>(null)
+
     val uiState: StateFlow<SpeechLineScreenUiState> =
         combine(
             schmRepo.getSpeech(speechId).filterNotNull(),
             schmRepo.getSpeechLines(speechId),
             currLineNum,
-            answerVisible
-        ) { speech, lines, currNum, ansVisible ->
+            answerVisible,
+            totalTimeMillis
+        ) { speech, lines, currNum, ansVisible, totalTime ->
             val sortedLines = lines.sortedBy { it.order }
-            val isFinished = currNum > sortedLines.size
+            val isFinished = sortedLines.isNotEmpty() && currNum > sortedLines.size
             val currentLineIndex = currNum - 1
             val currentLine = if (isFinished) null else if (sortedLines.isNotEmpty() && currentLineIndex < sortedLines.size) sortedLines[currentLineIndex] else null
 
-            // Refresh icon shown when finished OR on last line and it's revealed
-            val isAtEnd = isFinished || (currNum == sortedLines.size && ansVisible)
+            // isAtEnd means we have revealed the last line
+            val isAtEnd = sortedLines.isNotEmpty() && (isFinished || (currNum == sortedLines.size && ansVisible))
 
             SpeechLineScreenUiState(
                 speech = speech,
@@ -63,7 +67,8 @@ class SpeechViewModel(
                 totalSpeechLines = sortedLines.size,
                 answerVisible = ansVisible,
                 isAtEnd = isAtEnd,
-                isFinished = isFinished
+                isFinished = isFinished,
+                totalTimeMillis = totalTime
             )
         }
             .stateIn(
@@ -75,13 +80,30 @@ class SpeechViewModel(
                 )
             )
 
+    private fun startTimerIfNeeded() {
+        if (startTimeMillis == null) {
+            startTimeMillis = System.currentTimeMillis()
+        }
+    }
+
+    private fun checkFinish() {
+        val state = uiState.value
+        if (state.isAtEnd && totalTimeMillis.value == null) {
+            startTimeMillis?.let { start ->
+                totalTimeMillis.value = System.currentTimeMillis() - start
+            }
+        }
+    }
+
     fun prevSpeechLine() {
+        startTimerIfNeeded()
         val state = uiState.value
         if (state.lineList.isEmpty()) return
-        
+
         if (state.isFinished) {
             currLineNum.value = state.lineList.size
-            answerVisible.value = true // Keep revealed when coming back from finish
+            answerVisible.value = true
+            checkFinish()
             return
         }
 
@@ -89,12 +111,14 @@ class SpeechViewModel(
             currLineNum.value -= 1
             answerVisible.value = false
         }
+        checkFinish()
     }
 
     fun nextSpeechLine() {
+        startTimerIfNeeded()
         val state = uiState.value
         if (state.lineList.isEmpty()) return
-        
+
         if (state.isAtEnd) {
             restart()
             return
@@ -108,15 +132,20 @@ class SpeechViewModel(
                 answerVisible.value = true
             }
         }
+        checkFinish()
     }
 
     private fun restart() {
+        startTimeMillis = null
+        totalTimeMillis.value = null
         currLineNum.value = 1
         answerVisible.value = false
     }
 
     fun toggleAnswer() {
+        startTimerIfNeeded()
         answerVisible.value = !answerVisible.value
+        checkFinish()
     }
 }
 
@@ -129,5 +158,6 @@ data class SpeechLineScreenUiState(
     val totalSpeechLines: Int = 0,
     val answerVisible: Boolean = false,
     val isAtEnd: Boolean = false,
-    val isFinished: Boolean = false
+    val isFinished: Boolean = false,
+    val totalTimeMillis: Long? = null
 )

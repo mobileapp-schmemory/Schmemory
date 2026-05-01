@@ -62,11 +62,11 @@ fun SpeechScreen(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { 
+                title = {
                     val titleText = if (uiState.speech.name.length > 20) uiState.speech.name.take(20) + "..." else uiState.speech.name
                     Text(
-                        text = if (uiState.totalSpeechLines == 0) titleText 
-                               else "$titleText (${uiState.currSpeechLineNum}/${uiState.totalSpeechLines})"
+                        text = if (uiState.totalSpeechLines == 0) titleText
+                        else "$titleText (${uiState.currSpeechLineNum}/${uiState.totalSpeechLines})"
                     )
                 },
                 navigationIcon = {
@@ -96,7 +96,7 @@ fun SpeechScreen(
                     ) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Previous")
                     }
-                    
+
                     Button(
                         onClick = viewModel::toggleAnswer,
                         colors = ButtonDefaults.buttonColors(
@@ -141,6 +141,7 @@ fun SpeechScreen(
                 previousLines = uiState.previousLines,
                 currentLine = uiState.currSpeechLine,
                 answerVisible = uiState.answerVisible,
+                totalTimeMillis = uiState.totalTimeMillis,
                 modifier = Modifier.padding(innerPadding).fillMaxSize()
             )
         } else {
@@ -159,14 +160,17 @@ fun SpeechRehearsalContent(
     previousLines: List<SpeechLine>,
     currentLine: SpeechLine,
     answerVisible: Boolean,
+    totalTimeMillis: Long?,
     modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
 
     // Automatically scroll to the bottom when new lines are added or your line is revealed
-    LaunchedEffect(previousLines.size, answerVisible) {
-        if (previousLines.isNotEmpty() || answerVisible) {
-            val lastIndex = if (answerVisible) previousLines.size else (previousLines.size - 1).coerceAtLeast(0)
+    LaunchedEffect(previousLines.size, answerVisible, totalTimeMillis) {
+        if (previousLines.isNotEmpty() || answerVisible || totalTimeMillis != null) {
+            val lastIndex = if (totalTimeMillis != null) previousLines.size + 1
+            else if (answerVisible) previousLines.size
+            else (previousLines.size - 1).coerceAtLeast(0)
             listState.animateScrollToItem(lastIndex)
         }
     }
@@ -180,7 +184,7 @@ fun SpeechRehearsalContent(
             items(previousLines) { line ->
                 SpeechLineItem(line = line)
             }
-            
+
             item {
                 if (currentLine.id != 0L) {
                     Column(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
@@ -193,7 +197,7 @@ fun SpeechRehearsalContent(
                         if (answerVisible) {
                             Text(
                                 text = currentLine.text,
-                                fontSize = 22.sp,
+                                style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.padding(top = 4.dp),
                                 color = MaterialTheme.colorScheme.onBackground
                             )
@@ -209,6 +213,36 @@ fun SpeechRehearsalContent(
                     }
                 }
             }
+
+            if (totalTimeMillis != null) {
+                item {
+                    val seconds = totalTimeMillis / 1000
+                    val minutes = seconds / 60
+                    val remainingSeconds = seconds % 60
+                    val timeString = if (minutes > 0) "${minutes}m ${remainingSeconds}s" else "${remainingSeconds}s"
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 24.dp)
+                            .background(Blue.copy(alpha = 0.1f), MaterialTheme.shapes.medium)
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Speech Complete!",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = CharBlue
+                        )
+                        Text(
+                            text = "Total Time: $timeString",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -218,13 +252,13 @@ fun SpeechLineItem(line: SpeechLine) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = line.text,
-            fontSize = 18.sp,
+            style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(top = 2.dp)
         )
         HorizontalDivider(
-            modifier = Modifier.padding(top = 8.dp), 
-            thickness = 0.5.dp, 
+            modifier = Modifier.padding(top = 8.dp),
+            thickness = 0.5.dp,
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.12f)
         )
     }

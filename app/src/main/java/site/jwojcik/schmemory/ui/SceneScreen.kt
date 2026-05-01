@@ -35,7 +35,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -47,7 +46,6 @@ import site.jwojcik.schmemory.ui.theme.Blue
 import site.jwojcik.schmemory.ui.theme.Black
 import site.jwojcik.schmemory.ui.theme.CharBlue
 import site.jwojcik.schmemory.ui.theme.White
-import site.jwojcik.schmemory.ui.theme.Yellow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,11 +62,11 @@ fun SceneScreen(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { 
+                title = {
                     val titleText = if (uiState.scene.name.length > 20) uiState.scene.name.take(20) + "..." else uiState.scene.name
                     Text(
-                        text = if (uiState.totalSceneLines == 0) titleText 
-                               else "$titleText (${uiState.currSceneLineNum}/${uiState.totalSceneLines})"
+                        text = if (uiState.totalSceneLines == 0) titleText
+                        else "$titleText (${uiState.currSceneLineNum}/${uiState.totalSceneLines})"
                     )
                 },
                 navigationIcon = {
@@ -147,6 +145,7 @@ fun SceneScreen(
                 currentLine = uiState.currSceneLine,
                 readingFor = uiState.scene.readingFor,
                 answerVisible = uiState.answerVisible,
+                totalTimeMillis = uiState.totalTimeMillis,
                 modifier = Modifier.padding(innerPadding).fillMaxSize()
             )
         } else {
@@ -166,14 +165,17 @@ fun RehearsalContent(
     currentLine: SceneLine,
     readingFor: String,
     answerVisible: Boolean,
+    totalTimeMillis: Long?,
     modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
 
     // Automatically scroll to the bottom when new lines are added or your line is revealed
-    LaunchedEffect(previousLines.size, answerVisible) {
-        if (previousLines.isNotEmpty() || answerVisible) {
-            val lastIndex = if (answerVisible) previousLines.size else (previousLines.size - 1).coerceAtLeast(0)
+    LaunchedEffect(previousLines.size, answerVisible, totalTimeMillis) {
+        if (previousLines.isNotEmpty() || answerVisible || totalTimeMillis != null) {
+            val lastIndex = if (totalTimeMillis != null) previousLines.size + 1
+            else if (answerVisible) previousLines.size
+            else (previousLines.size - 1).coerceAtLeast(0)
             listState.animateScrollToItem(lastIndex)
         }
     }
@@ -187,7 +189,7 @@ fun RehearsalContent(
             items(previousLines) { line ->
                 LineItem(line = line, isUser = line.characterName.equals(readingFor, ignoreCase = true))
             }
-            
+
             item {
                 Column(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
                     Text(
@@ -199,7 +201,7 @@ fun RehearsalContent(
                     if (answerVisible) {
                         Text(
                             text = currentLine.text,
-                            fontSize = 22.sp,
+                            style = MaterialTheme.typography.titleLarge,
                             modifier = Modifier.padding(top = 4.dp),
                             color = MaterialTheme.colorScheme.onBackground
                         )
@@ -210,6 +212,36 @@ fun RehearsalContent(
                                 .fillMaxWidth()
                                 .height(48.dp)
                                 .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f))
+                        )
+                    }
+                }
+            }
+
+            if (totalTimeMillis != null) {
+                item {
+                    val seconds = totalTimeMillis / 1000
+                    val minutes = seconds / 60
+                    val remainingSeconds = seconds % 60
+                    val timeString = if (minutes > 0) "${minutes}m ${remainingSeconds}s" else "${remainingSeconds}s"
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 24.dp)
+                            .background(Blue.copy(alpha = 0.1f), MaterialTheme.shapes.medium)
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Scene Complete!",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = CharBlue
+                        )
+                        Text(
+                            text = "Total Time: $timeString",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(top = 8.dp)
                         )
                     }
                 }
@@ -229,13 +261,13 @@ fun LineItem(line: SceneLine, isUser: Boolean) {
         )
         Text(
             text = line.text,
-            fontSize = 18.sp,
+            style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(top = 2.dp)
         )
         HorizontalDivider(
-            modifier = Modifier.padding(top = 8.dp), 
-            thickness = 0.5.dp, 
+            modifier = Modifier.padding(top = 8.dp),
+            thickness = 0.5.dp,
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.12f)
         )
     }

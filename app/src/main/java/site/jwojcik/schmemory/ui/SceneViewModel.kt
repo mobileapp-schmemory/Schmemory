@@ -41,25 +41,28 @@ class SceneViewModel(
     private val currLineNum = MutableStateFlow(1)
     private val answerVisible = MutableStateFlow(false)
 
+    private var startTimeMillis: Long? = null
+    private val _totalTimeMillis = MutableStateFlow<Long?>(null)
+
     val uiState: StateFlow<SceneLineScreenUiState> =
         combine(
             schmRepo.getScene(sceneId).filterNotNull(),
             schmRepo.getSceneLines(sceneId),
             currLineNum,
-            answerVisible
-        ) { scene, lines, currNum, ansVisible ->
+            answerVisible,
+            _totalTimeMillis
+        ) { scene, lines, currNum, ansVisible, totalTime ->
             val sortedLines = lines.sortedBy { it.order }
             val currentLineIndex = currNum - 1
             val currentLine = if (sortedLines.isNotEmpty() && currentLineIndex < sortedLines.size) sortedLines[currentLineIndex] else null
-            
+
             val isUserLine = currentLine?.characterName?.equals(scene.readingFor, ignoreCase = true) ?: false
-            
+
             // Auto-reveal if not user line
             val effectiveAnsVisible = if (!isUserLine && currentLine != null) true else ansVisible
 
-            // isAtEnd means we are on the last line. 
-            // The Refresh icon should be shown here because there's no "Next" line.
-            val isAtEnd = sortedLines.isNotEmpty() && currNum == sortedLines.size
+            // isAtEnd means we are on the last line and it is revealed (or auto-revealed).
+            val isAtEnd = sortedLines.isNotEmpty() && currNum == sortedLines.size && effectiveAnsVisible
 
             SceneLineScreenUiState(
                 scene = scene,
@@ -70,7 +73,8 @@ class SceneViewModel(
                 totalSceneLines = sortedLines.size,
                 answerVisible = effectiveAnsVisible,
                 isUserLine = isUserLine,
-                isAtEnd = isAtEnd
+                isAtEnd = isAtEnd,
+                totalTimeMillis = totalTime
             )
         }
             .stateIn(
@@ -96,16 +100,34 @@ class SceneViewModel(
                 }
             }
         }
+
+        // Reactive timer stop logic
+        viewModelScope.launch {
+            uiState.collect { state ->
+                if (state.isAtEnd && _totalTimeMillis.value == null) {
+                    startTimeMillis?.let { start ->
+                        _totalTimeMillis.value = System.currentTimeMillis() - start
+                    }
+                }
+            }
+        }
+    }
+
+    private fun startTimerIfNeeded() {
+        if (startTimeMillis == null) {
+            startTimeMillis = System.currentTimeMillis()
+        }
     }
 
     fun prevSceneLine() {
+        startTimerIfNeeded()
         val state = uiState.value
         val lines = state.lineList
         val readingFor = state.scene.readingFor
         if (lines.isEmpty()) return
-        
+
         val currentIndex = currLineNum.value - 1
-        
+
         if (readingFor.isBlank()) {
             currLineNum.value = if (currLineNum.value > 1) currLineNum.value - 1 else 1
             answerVisible.value = false
@@ -130,11 +152,12 @@ class SceneViewModel(
     }
 
     fun nextSceneLine() {
+        startTimerIfNeeded()
         val state = uiState.value
         val lines = state.lineList
         val readingFor = state.scene.readingFor
         if (lines.isEmpty()) return
-        
+
         if (state.isAtEnd) {
             restart()
             return
@@ -143,11 +166,13 @@ class SceneViewModel(
         val currentIndex = currLineNum.value - 1
 
         if (readingFor.isBlank()) {
-            currLineNum.value += 1
+            if (currLineNum.value < lines.size) {
+                currLineNum.value += 1
+            }
             answerVisible.value = false
             return
         }
-        
+
         var nextUserIndex = -1
         for (i in (currentIndex + 1) until lines.size) {
             if (lines[i].characterName.equals(readingFor, ignoreCase = true)) {
@@ -166,6 +191,8 @@ class SceneViewModel(
     }
 
     private fun restart() {
+        startTimeMillis = null
+        _totalTimeMillis.value = null
         viewModelScope.launch {
             val scene = schmRepo.getScene(sceneId).filterNotNull().first()
             val lines = schmRepo.getSceneLines(sceneId).first()
@@ -183,6 +210,7 @@ class SceneViewModel(
     }
 
     fun toggleAnswer() {
+        startTimerIfNeeded()
         answerVisible.value = !answerVisible.value
     }
 }
@@ -196,5 +224,6 @@ data class SceneLineScreenUiState(
     val totalSceneLines: Int = 0,
     val answerVisible: Boolean = false,
     val isUserLine: Boolean = false,
-    val isAtEnd: Boolean = false
+    val isAtEnd: Boolean = false,
+    val totalTimeMillis: Long? = null
 )
