@@ -1,6 +1,7 @@
 package site.jwojcik.schmemory.ui.theme
 
 import androidx.compose.material3.Typography
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import site.jwojcik.schmemory.R
@@ -11,25 +12,36 @@ val HappyMonkey = FontFamily(
 
 private val defaultTypography = Typography()
 
-fun getTypography(fontFamily: FontFamily): Typography {
-    return Typography(
-        displayLarge = defaultTypography.displayLarge.copy(fontFamily = fontFamily),
-        displayMedium = defaultTypography.displayMedium.copy(fontFamily = fontFamily),
-        displaySmall = defaultTypography.displaySmall.copy(fontFamily = fontFamily),
-        headlineLarge = defaultTypography.headlineLarge.copy(fontFamily = fontFamily),
-        headlineMedium = defaultTypography.headlineMedium.copy(fontFamily = fontFamily),
-        headlineSmall = defaultTypography.headlineSmall.copy(fontFamily = fontFamily),
-        titleLarge = defaultTypography.titleLarge.copy(fontFamily = fontFamily),
-        titleMedium = defaultTypography.titleMedium.copy(fontFamily = fontFamily),
-        titleSmall = defaultTypography.titleSmall.copy(fontFamily = fontFamily),
-        bodyLarge = defaultTypography.bodyLarge.copy(fontFamily = fontFamily),
-        bodyMedium = defaultTypography.bodyMedium.copy(fontFamily = fontFamily),
-        bodySmall = defaultTypography.bodySmall.copy(fontFamily = fontFamily),
-        labelLarge = defaultTypography.labelLarge.copy(fontFamily = fontFamily),
-        labelMedium = defaultTypography.labelMedium.copy(fontFamily = fontFamily),
-        labelSmall = defaultTypography.labelSmall.copy(fontFamily = fontFamily)
+private fun TextStyle.scaled(scale: Float, fontFamily: FontFamily): TextStyle {
+    return this.copy(
+        fontFamily = fontFamily,
+        fontSize = this.fontSize * scale,
+        lineHeight = this.lineHeight * scale
     )
 }
 
-// Default typography using Happy Monkey
+/**
+ * Returns the application typography with the specified [fontFamily] and [scale] factor applied.
+ */
+fun getTypography(fontFamily: FontFamily, scale: Float = 1f): Typography {
+    return Typography(
+        displayLarge = defaultTypography.displayLarge.scaled(scale, fontFamily),
+        displayMedium = defaultTypography.displayMedium.scaled(scale, fontFamily),
+        displaySmall = defaultTypography.displaySmall.scaled(scale, fontFamily),
+        headlineLarge = defaultTypography.headlineLarge.scaled(scale, fontFamily),
+        headlineMedium = defaultTypography.headlineMedium.scaled(scale, fontFamily),
+        headlineSmall = defaultTypography.headlineSmall.scaled(scale, fontFamily),
+        titleLarge = defaultTypography.titleLarge.scaled(scale, fontFamily),
+        titleMedium = defaultTypography.titleMedium.scaled(scale, fontFamily),
+        titleSmall = defaultTypography.titleSmall.scaled(scale, fontFamily),
+        bodyLarge = defaultTypography.bodyLarge.scaled(scale, fontFamily),
+        bodyMedium = defaultTypography.bodyMedium.scaled(scale, fontFamily),
+        bodySmall = defaultTypography.bodySmall.scaled(scale, fontFamily),
+        labelLarge = defaultTypography.labelLarge.scaled(scale, fontFamily),
+        labelMedium = defaultTypography.labelMedium.scaled(scale, fontFamily),
+        labelSmall = defaultTypography.labelSmall.scaled(scale, fontFamily)
+    )
+}
+
+// Default typography using Happy Monkey at normal scale
 val Typography = getTypography(HappyMonkey)
