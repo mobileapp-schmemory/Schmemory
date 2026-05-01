@@ -73,7 +73,7 @@ fun EditScreen(
 
     if (showUnsavedDialog) {
         AlertDialog(
-            onDismissRequest = { },//showUnsavedDialog = false },
+            onDismissRequest = { showUnsavedDialog = false },
             title = { Text("Unsaved Changes") },
             text = { Text("You have unsaved changes. Are you sure you want to discard them?") },
             confirmButton = {
@@ -82,7 +82,7 @@ fun EditScreen(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { }) {//showUnsavedDialog = false }) {
+                TextButton(onClick = { showUnsavedDialog = false }) {
                     Text("Cancel")
                 }
             }
