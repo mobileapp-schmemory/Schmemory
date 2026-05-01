@@ -49,20 +49,27 @@ class SceneViewModel(
             answerVisible
         ) { scene, lines, currNum, ansVisible ->
             val sortedLines = lines.sortedBy { it.order }
-            val currentLineIndex = (currNum - 1).coerceIn(0, (sortedLines.size - 1).coerceAtLeast(0))
-            val currentLine = if (sortedLines.isNotEmpty()) sortedLines[currentLineIndex] else null
+            val currentLineIndex = currNum - 1
+            val currentLine = if (sortedLines.isNotEmpty() && currentLineIndex < sortedLines.size) sortedLines[currentLineIndex] else null
             
             val isUserLine = currentLine?.characterName?.equals(scene.readingFor, ignoreCase = true) ?: false
+            val isFinished = currNum > sortedLines.size
+            
+            // isAtEnd means we are on the last step of the current practice session
+            // Either we are on the last line and it's revealed/cue, or we are finished.
+            val isAtEnd = isFinished || (currNum == sortedLines.size && (!isUserLine || ansVisible))
 
             SceneLineScreenUiState(
                 scene = scene,
                 lineList = sortedLines,
                 currSceneLine = currentLine ?: SceneLine(0, 0, 0, "", ""),
-                previousLines = if (currentLine != null) sortedLines.take(currentLineIndex) else emptyList(),
-                currSceneLineNum = currNum,
+                previousLines = if (isFinished) sortedLines else sortedLines.take(currentLineIndex.coerceAtLeast(0)),
+                currSceneLineNum = if (isFinished) sortedLines.size else currNum,
                 totalSceneLines = sortedLines.size,
                 answerVisible = ansVisible,
-                isUserLine = isUserLine
+                isUserLine = isUserLine,
+                isAtEnd = isAtEnd,
+                isFinished = isFinished
             )
         }
             .stateIn(
@@ -96,33 +103,35 @@ class SceneViewModel(
         val readingFor = state.scene.readingFor
         if (lines.isEmpty()) return
         
-        val currentIndex = state.currSceneLineNum - 1
-        
-        if (readingFor.isBlank()) {
-            currLineNum.value = if (currLineNum.value > 1) currLineNum.value - 1 else lines.size
+        if (state.isFinished) {
+            currLineNum.value = lines.size
             answerVisible.value = false
             return
         }
 
-        var prevIndex = (currentIndex - 1 + lines.size) % lines.size
-        var found = false
-        val start = prevIndex
+        val currentIndex = currLineNum.value - 1
         
-        do {
-            if (lines[prevIndex].characterName.equals(readingFor, ignoreCase = true)) {
-                found = true
+        if (readingFor.isBlank()) {
+            currLineNum.value = if (currLineNum.value > 1) currLineNum.value - 1 else 1
+            answerVisible.value = false
+            return
+        }
+
+        var prevUserIndex = -1
+        for (i in (currentIndex - 1) downTo 0) {
+            if (lines[i].characterName.equals(readingFor, ignoreCase = true)) {
+                prevUserIndex = i
                 break
             }
-            prevIndex = (prevIndex - 1 + lines.size) % lines.size
-        } while (prevIndex != start)
-
-        if (found) {
-            currLineNum.value = prevIndex + 1
-            answerVisible.value = false
-        } else {
-            currLineNum.value = if (currLineNum.value > 1) currLineNum.value - 1 else lines.size
-            answerVisible.value = false
         }
+
+        if (prevUserIndex != -1) {
+            currLineNum.value = prevUserIndex + 1
+        } else {
+            val firstUserIndex = lines.indexOfFirst { it.characterName.equals(readingFor, ignoreCase = true) }
+            currLineNum.value = if (firstUserIndex != -1) firstUserIndex + 1 else 1
+        }
+        answerVisible.value = false
     }
 
     fun nextSceneLine() {
@@ -131,41 +140,62 @@ class SceneViewModel(
         val readingFor = state.scene.readingFor
         if (lines.isEmpty()) return
         
-        val currentIndex = state.currSceneLineNum - 1
+        if (state.isFinished) {
+            restart()
+            return
+        }
+
+        val currentIndex = currLineNum.value - 1
         
+        // If we are at the point where we would "finish"
+        if (state.isAtEnd) {
+            currLineNum.value = lines.size + 1
+            answerVisible.value = false
+            return
+        }
+
         if (readingFor.isBlank()) {
-            currLineNum.value = if (currLineNum.value < lines.size) currLineNum.value + 1 else 1
+            currLineNum.value += 1
             answerVisible.value = false
             return
         }
         
-        var nextIndex = (currentIndex + 1) % lines.size
-        var found = false
-        val start = nextIndex
-        
-        do {
-            if (lines[nextIndex].characterName.equals(readingFor, ignoreCase = true)) {
-                found = true
+        var nextUserIndex = -1
+        for (i in (currentIndex + 1) until lines.size) {
+            if (lines[i].characterName.equals(readingFor, ignoreCase = true)) {
+                nextUserIndex = i
                 break
             }
-            nextIndex = (nextIndex + 1) % lines.size
-        } while (nextIndex != start)
+        }
 
-        if (found) {
-            currLineNum.value = nextIndex + 1
-            answerVisible.value = false
+        if (nextUserIndex != -1) {
+            currLineNum.value = nextUserIndex + 1
         } else {
-            currLineNum.value = if (currLineNum.value < lines.size) currLineNum.value + 1 else 1
+            // No more user lines, go to the last line as a cue
+            currLineNum.value = lines.size
+        }
+        answerVisible.value = false
+    }
+
+    private fun restart() {
+        viewModelScope.launch {
+            val scene = schmRepo.getScene(sceneId).filterNotNull().first()
+            val lines = schmRepo.getSceneLines(sceneId).first()
+            if (lines.isNotEmpty()) {
+                val sortedLines = lines.sortedBy { it.order }
+                val firstUserIndex = sortedLines.indexOfFirst {
+                    it.characterName.equals(scene.readingFor, ignoreCase = true)
+                }
+                currLineNum.value = if (firstUserIndex != -1) firstUserIndex + 1 else 1
+            } else {
+                currLineNum.value = 1
+            }
             answerVisible.value = false
         }
     }
 
     fun toggleAnswer() {
         answerVisible.value = !answerVisible.value
-    }
-
-    fun deleteSceneLine() {
-        // TODO: Complete this function
     }
 }
 
@@ -177,5 +207,7 @@ data class SceneLineScreenUiState(
     val currSceneLineNum: Int = 1,
     val totalSceneLines: Int = 0,
     val answerVisible: Boolean = false,
-    val isUserLine: Boolean = false
+    val isUserLine: Boolean = false,
+    val isAtEnd: Boolean = false,
+    val isFinished: Boolean = false
 )

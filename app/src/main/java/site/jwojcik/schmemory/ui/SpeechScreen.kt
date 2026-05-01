@@ -1,5 +1,6 @@
 package site.jwojcik.schmemory.ui
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,6 +16,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -32,6 +35,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,6 +56,7 @@ fun SpeechScreen(
     onUpClick: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -81,12 +86,13 @@ fun SpeechScreen(
                 containerColor = Blue,
                 contentColor = Black
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                Box(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
                 ) {
-                    IconButton(onClick = viewModel::prevSpeechLine) {
+                    IconButton(
+                        onClick = viewModel::prevSpeechLine,
+                        modifier = Modifier.align(Alignment.CenterStart)
+                    ) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Previous")
                     }
                     
@@ -95,13 +101,35 @@ fun SpeechScreen(
                         colors = ButtonDefaults.buttonColors(
                             containerColor = White,
                             contentColor = CharBlue
-                        )
+                        ),
+                        modifier = Modifier.align(Alignment.Center)
                     ) {
                         Text(if (uiState.answerVisible) "Hide Line" else "Reveal Line")
                     }
 
-                    IconButton(onClick = viewModel::nextSpeechLine) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next")
+                    Row(
+                        modifier = Modifier.align(Alignment.CenterEnd),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(onClick = {
+                            val sendIntent: Intent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(Intent.EXTRA_TEXT, "I'm Schmemorizing!\n${uiState.speech.name}: ${uiState.currSpeechLine.text}")
+                                type = "text/plain"
+                            }
+                            val shareIntent = Intent.createChooser(sendIntent, null)
+                            context.startActivity(shareIntent)
+                        }) {
+                            Icon(Icons.Default.Share, contentDescription = "Share")
+                        }
+
+                        IconButton(onClick = viewModel::nextSpeechLine) {
+                            if (uiState.isAtEnd && uiState.answerVisible) {
+                                Icon(Icons.Default.Refresh, contentDescription = "Restart")
+                            } else {
+                                Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next")
+                            }
+                        }
                     }
                 }
             }
