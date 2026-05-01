@@ -1,6 +1,7 @@
 package site.jwojcik.schmemory.ui
 
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
@@ -10,6 +11,8 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,14 +21,17 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,6 +49,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -56,9 +63,9 @@ import kotlinx.coroutines.launch
 import site.jwojcik.schmemory.R
 import site.jwojcik.schmemory.ui.theme.Blue
 import site.jwojcik.schmemory.ui.theme.Green
-import site.jwojcik.schmemory.ui.theme.Yellow
 
-
+var easterEggClicks = 0
+var logo = R.drawable.logo
 @Composable
 fun HomeScreen(
     onScenesClick: () -> Unit,
@@ -71,7 +78,6 @@ fun HomeScreen(
         onSettingsClick = onSettingsClick
     )
 }
-
 
 @Composable
 fun HomePageScreen(
@@ -103,41 +109,55 @@ fun HomePageScreen(
             .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
-        if (showSmallButtons) {
-            // Top Left Button
-            MorphingButton(
-                morph = morph,
-                iconRes = R.drawable.podium,
-                contentDescription = "Speech Screen Button",
-                onClick = onSpeechesClick,
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(top = 220.dp, start = 32.dp)
-            )
+        // Thought Bubble
+        ThoughtBubble(
+            text = "Time to Schmemorize!",
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 100.dp)
+        )
+
+        AnimatedVisibility(
+            visible = showSmallButtons,
+            enter = fadeIn(animationSpec = tween(800)),
+            exit = fadeOut(animationSpec = tween(400))
+        ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                // Top Left Button
+                MorphingButton(
+                    morph = morph,
+                    iconRes = R.drawable.podium,
+                    contentDescription = "Speech Screen Button",
+                    onClick = onSpeechesClick,
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(top = 220.dp, start = 32.dp)
+                )
 
 
-            // Top Right Button
-            MorphingButton(
-                morph = morph,
-                iconRes = R.drawable.masks,
-                contentDescription = "Scenes Screen Button",
-                onClick = onScenesClick,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(top = 220.dp, end = 32.dp)
-            )
+                // Top Right Button
+                MorphingButton(
+                    morph = morph,
+                    iconRes = R.drawable.masks,
+                    contentDescription = "Scenes Screen Button",
+                    onClick = onScenesClick,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 220.dp, end = 32.dp)
+                )
 
 
-            // Bottom Settings Button
-            MorphingButton(
-                morph = morph,
-                iconRes = R.drawable.gear,
-                contentDescription = "Settings Screen Button",
-                onClick = onSettingsClick,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 170.dp)
-            )
+                // Bottom Settings Button
+                MorphingButton(
+                    morph = morph,
+                    iconRes = R.drawable.gear,
+                    contentDescription = "Settings Screen Button",
+                    onClick = onSettingsClick,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 170.dp)
+                )
+            }
         }
 
 
@@ -337,7 +357,7 @@ private fun RotatingScallopedLogo(
         colors = colors
     ) {
         Image(
-            painter = painterResource(id = R.drawable.logo),
+            painter = painterResource(logo),
             contentDescription = "Home Button",
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
@@ -366,5 +386,54 @@ class MorphPolygonShape(
         val path = morph.toPath(progress = percentage).asComposePath()
         path.transform(matrix)
         return Outline.Generic(path)
+    }
+}
+
+
+@Composable
+fun ThoughtBubble(text: String, modifier: Modifier = Modifier) {
+    val infiniteTransition = rememberInfiniteTransition(label = "thought bubble floating")
+    val floatingOffset by infiniteTransition.animateFloat(
+        initialValue = -10f,
+        targetValue = 10f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2500, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "floating",
+    )
+
+    Box(modifier = modifier.offset(y = floatingOffset.dp)) {
+        // Small "thought" circles
+        Box(
+            modifier = Modifier
+                .size(12.dp)
+                .align(Alignment.BottomEnd)
+                .offset(x = 10.dp, y = 5.dp)
+                .background(Blue, shape = CircleShape)
+        )
+        Box(
+            modifier = Modifier
+                .size(8.dp)
+                .align(Alignment.BottomEnd)
+                .offset(x = 20.dp, y = 15.dp)
+                .background(Blue, shape = CircleShape)
+        )
+
+        // The main bubble
+        Box(
+            modifier = Modifier
+                .background(Blue, shape = RoundedCornerShape(24.dp))
+                .padding(horizontal = 24.dp, vertical = 12.dp)
+                .clickable{easterEggClicks++; if (easterEggClicks == 15) {logo = R.drawable.anya} },
+
+            ) {
+            Text(
+                text = text,
+                color = Color.White,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.ExtraBold
+            )
+        }
     }
 }
