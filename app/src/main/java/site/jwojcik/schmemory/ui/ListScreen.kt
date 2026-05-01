@@ -276,6 +276,21 @@ fun ListScreen(
                                 isError = importError != null,
                                 enabled = !isImporting
                             )
+                            if (listType == SchmemoryListType.SCENE) {
+                                Text(
+                                    text = "Character you're reading for (as listed in the file):",
+                                    modifier = Modifier.padding(top = 16.dp)
+                                )
+                                TextField(
+                                    value = readingFor,
+                                    onValueChange = { readingFor = it },
+                                    placeholder = { Text("Character name") },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 8.dp),
+                                    enabled = !isImporting
+                                )
+                            }
                             if (importError != null) {
                                 Text(
                                     text = importError!!,
@@ -326,10 +341,12 @@ fun ListScreen(
                                 viewModel.importFromPastebin(
                                     url = importUrl,
                                     listType = listType,
+                                    readingFor = readingFor,
                                     onSuccess = {
                                         isImporting = false
                                         showAddDialog = false
                                         importUrl = ""
+                                        readingFor = ""
                                     },
                                     onError = { error ->
                                         isImporting = false

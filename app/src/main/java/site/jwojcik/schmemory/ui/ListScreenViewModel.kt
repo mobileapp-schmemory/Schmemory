@@ -118,7 +118,13 @@ class ListScreenViewModel(private val schmRepo: SchmemoryRepository) : ViewModel
         }
     }
 
-    fun importFromPastebin(url: String, listType: SchmemoryListType, onSuccess: () -> Unit, onError: (String) -> Unit) {
+    fun importFromPastebin(
+        url: String,
+        listType: SchmemoryListType,
+        readingFor: String = "",
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
         val trimmedUrl = url.trim()
         val finalUrl = if (!trimmedUrl.startsWith("http://") && !trimmedUrl.startsWith("https://")) {
             "https://$trimmedUrl"
@@ -131,7 +137,7 @@ class ListScreenViewModel(private val schmRepo: SchmemoryRepository) : ViewModel
                 val content = withContext(Dispatchers.IO) {
                     URL(finalUrl).readText()
                 }
-                parseAndSaveImport(content, listType)
+                parseAndSaveImport(content, listType, readingFor)
                 onSuccess()
             } catch (e: Exception) {
                 val errorMsg = when (e) {
@@ -144,13 +150,13 @@ class ListScreenViewModel(private val schmRepo: SchmemoryRepository) : ViewModel
         }
     }
 
-    private suspend fun parseAndSaveImport(content: String, listType: SchmemoryListType) {
+    private suspend fun parseAndSaveImport(content: String, listType: SchmemoryListType, readingFor: String) {
         val lines = content.lines().filter { it.isNotBlank() }
         if (lines.isEmpty()) return
 
         val title = lines[0]
         if (listType == SchmemoryListType.SCENE) {
-            val sceneId = schmRepo.addScene(Scene(name = title, readingFor = "Imported"))
+            val sceneId = schmRepo.addScene(Scene(name = title, readingFor = readingFor))
             lines.drop(1).forEachIndexed { index, lineText ->
                 val parts = lineText.split(":", limit = 2)
                 val character = if (parts.size > 1) parts[0].trim() else "Unknown"
