@@ -1,16 +1,19 @@
-# Schmemory
-An app that helps people memorize speeches and scripts.<br><br>
+# Schmemory: Speech/Script Memorization
 
-Here is a link to our Preliminary Plan<br>
-https://docs.google.com/document/d/1N9y9wqNIZRm2PCI9Kck54b6t_qmnAbK2N6Lb2O2uafU/edit?usp=sharing
-<br><br>
-Here is a link to the logo design by Sarah Todd
-https://docs.google.com/drawings/d/1kcGseokzwhWXosYhPXV7BHF3qplmHhbWKe9jtTO1Ei4/edit?usp=sharing
-<br><br> 
-Here is a link to secondary icon designs by Sarah Todd<br>
-Podium:<br>
-https://docs.google.com/drawings/d/1R0qNiTGEghpPrw1CekOTFmzXwNs1IaVquf9ig_OKkzs/edit<br>
-Masks:<br>
-https://docs.google.com/drawings/d/17IaiTs45wIQpZlKRT8BrYhzwYrMlUvo5FUYdnpxSygk/edit<br>
-Gear:<br>
-https://docs.google.com/drawings/d/10qa2f4WJoJq-Ds5SI5zJGN-_xvfXS8ze-lU2Eto44v8/edit?usp=sharing
+
+
+---
+
+## Initial Project Concept
+- An app that helps people memorize speeches and scripts.
+- Speech Mode - Takes a bunch of text, splits by sentence, lets you view each sentence one-by-one.
+- Script Mode - Takes a set of lines and prompts you with the cue lines
+- Some form of progress bar, in the form of a time check. 
+  - "I expect this speech/scene to take 5 minutes to read.”
+- Potentially an auto-advance feature using voice recognition
+  (forces people to read their script aloud, which helps you memorize better)
+
+---
+
+## Logo Design (by Sarah Todd)
+
