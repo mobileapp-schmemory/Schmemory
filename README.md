@@ -24,9 +24,9 @@
 
 *Icon Design*
 <p float="left">
-<img src="images/podium.png" alt="Podium Icon Design" width="32%" />
-<img src="images/masks.png" alt="Masks Icon Design" width="32%" />
-<img src="images/gear.png" alt="Gear Icon Design" width="32%" />
+  <img src="images/podium.png" alt="Podium Icon Design" width="32%" />
+  <img src="images/masks.png" alt="Masks Icon Design" width="32%" />
+  <img src="images/gear.png" alt="Gear Icon Design" width="32%" />
 </p>
 
 ---
