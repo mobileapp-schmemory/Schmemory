@@ -17,3 +17,21 @@
 
 ## Logo Design (by Sarah Todd)
 
+*Logo Design*
+<p float="left">
+  <img src="images/Schmemory.png" alt="Schmemory Logo Design" width="100%" />
+</p>
+
+*Icon Design*
+<p float="left">
+<img src="images/podium.png" alt="Podium Icon Design" width="32%" />
+<img src="images/masks.png" alt="Masks Icon Design" width="32%" />
+<img src="assets/gear.jpg" alt="Gear Icon Design" width="32%" />
+</p>
+
+---
+
+## Demonstration Video
+
+![Demonstration Video](images/DemoRecording.webm)
+
