@@ -33,5 +33,4 @@
 
 ## Demonstration Video
 
-[[video src="https://github.com/mobileapp-schmemory/Schmemory/raw/refs/heads/main/images/Demo.m4v"]]
-
+https://github.com/user-attachments/assets/a46bc237-827e-4bba-a775-340a776a708f
